@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>com.ychp</groupId>
+    <artifactId>coding</artifactId>
+    <packaging>pom</packaging>
+    <version>1.0-SNAPSHOT</version>
+    <modules>
+        <module>common</module>
+        <module>utils</module>
+        <module>redis</module>
+        <module>freemarker</module>
+        <module>web-mvc</module>
+    </modules>
+
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+
+        <mybatis.version>3.4.1</mybatis.version>
+        <mybatis-spring.version>1.3.0</mybatis-spring.version>
+        <dubbo.version>2.5.3</dubbo.version>
+        <zkclient.version>0.1</zkclient.version>
+        <zookeeper.version>3.4.6</zookeeper.version>
+        <spring.version>4.2.7.RELEASE</spring.version>
+        <c3p0.version>0.9.5</c3p0.version>
+        <mysql-connector-java.version>5.1.38</mysql-connector-java.version>
+        <lombok.version>1.16.6</lombok.version>
+        <guava.version>18.0</guava.version>
+        <jedis.version>2.7.3</jedis.version>
+        <spring-data-redis.version>1.6.2.RELEASE</spring-data-redis.version>
+        <commons-lang3.version>3.4</commons-lang3.version>
+        <spring-boot.version>1.3.6.RELEASE</spring-boot.version>
+        <mybatis-spring-boot.version>1.1.1</mybatis-spring-boot.version>
+        <validation-api.version>1.1.0.Final</validation-api.version>
+        <hibernate.version>5.2.4.Final</hibernate.version>
+        <jackson.version>2.6.7</jackson.version>
+        <slf4j.version>1.7.20</slf4j.version>
+        <servlet-api.version>3.1.0</servlet-api.version>
+        <persistence-api.version>1.0</persistence-api.version>
+        <guava.version>18.0</guava.version>
+    </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <version>${lombok.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+            <version>${slf4j.version}</version>
+        </dependency>
+
+        <!-- guava -->
+        <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+            <version>${guava.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-lang3</artifactId>
+            <version>${commons-lang3.version}</version>
+        </dependency>
+
+    </dependencies>
+
+</project>
