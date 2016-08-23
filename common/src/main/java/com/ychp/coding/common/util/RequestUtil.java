@@ -9,11 +9,11 @@ import javax.servlet.http.HttpServletRequest;
  */
 public class RequestUtil {
 
-    public String getIp(HttpServletRequest request){
+    public static String getIp(HttpServletRequest request){
         return request.getRemoteAddr();
     }
 
-    public String getHost(HttpServletRequest request){
+    public static String getHost(HttpServletRequest request){
         return request.getRemoteHost();
     }
 }
