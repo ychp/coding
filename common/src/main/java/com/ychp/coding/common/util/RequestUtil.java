@@ -1,5 +1,7 @@
 package com.ychp.coding.common.util;
 
+import com.ychp.coding.common.model.IpAddress;
+
 import javax.servlet.http.HttpServletRequest;
 import java.io.BufferedReader;
 import java.io.InputStream;
@@ -34,21 +36,21 @@ public class RequestUtil {
 
     private static final String httpUrl = "http://apis.baidu.com/apistore/iplookupservice/iplookup";
 
+    private static final String apiKey = "http://apis.baidu.com/apistore/iplookupservice/iplookup";
+
     /**
-     * @param httpUrl
-     *            :请求接口
      * @param httpArg
      *            :参数
      * @return 返回结果
      */
-    public static String getIpAddress(String httpUrl, String httpArg, String apiKey) {
+    public static IpAddress getIpAddress(String httpArg) {
         BufferedReader reader = null;
         String result = null;
         StringBuffer sbf = new StringBuffer();
-        httpUrl = httpUrl + "?" + httpArg;
-
+        String requestUrl = httpUrl + "?" + httpArg;
+        IpAddress ipAddress = null;
         try {
-            URL url = new URL(httpUrl);
+            URL url = new URL(requestUrl);
             HttpURLConnection connection = (HttpURLConnection) url
                     .openConnection();
             connection.setRequestMethod("GET");
@@ -64,10 +66,11 @@ public class RequestUtil {
             }
             reader.close();
             result = sbf.toString();
+            ipAddress = JsonMapper.JSON_NON_DEFAULT_MAPPER.fromJson(result, IpAddress.class);
         } catch (Exception e) {
             e.printStackTrace();
         }
-        return result;
+        return ipAddress;
     }
 
 }
