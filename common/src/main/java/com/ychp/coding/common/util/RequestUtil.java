@@ -36,7 +36,7 @@ public class RequestUtil {
 
     private static final String httpUrl = "http://apis.baidu.com/apistore/iplookupservice/iplookup";
 
-    private static final String apiKey = "http://apis.baidu.com/apistore/iplookupservice/iplookup";
+    private static final String apiKey = "24bd43016ccf30255ceac63669d7684c";
 
     /**
      * @param httpArg
