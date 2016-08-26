@@ -10,6 +10,8 @@ import lombok.Data;
 @Data
 public class IpAddress {
 
+    private Boolean success;
+
     private String country;
 
     private String province;
@@ -18,4 +20,7 @@ public class IpAddress {
 
     private String isp;
 
+    public Boolean isSuccess(){
+        return success == null ? false : success;
+    }
 }

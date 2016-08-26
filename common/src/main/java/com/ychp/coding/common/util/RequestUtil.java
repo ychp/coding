@@ -73,10 +73,13 @@ public class RequestUtil {
             reader.close();
             str = sbf.toString();
             ipAddress = JsonMapper.JSON_NON_DEFAULT_MAPPER.fromJson(str, BaiduIpAddress.class);
-            result.setProvince(ipAddress.getRetData().getProvince());
-            result.setCity(ipAddress.getRetData().getCity());
-            result.setCountry(ipAddress.getRetData().getCountry());
-            result.setIsp(ipAddress.getRetData().getCarrier());
+            if(ipAddress.getErrNum() == 0) {
+                result.setSuccess(true);
+                result.setProvince(ipAddress.getRetData().getProvince());
+                result.setCity(ipAddress.getRetData().getCity());
+                result.setCountry(ipAddress.getRetData().getCountry());
+                result.setIsp(ipAddress.getRetData().getCarrier());
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -112,10 +115,13 @@ public class RequestUtil {
             reader.close();
             str = sbf.toString();
             ipAddress = JsonMapper.JSON_NON_DEFAULT_MAPPER.fromJson(str, TaobaoIpAddress.class);
-            result.setProvince(ipAddress.getData().getRegion());
-            result.setCity(ipAddress.getData().getCity());
-            result.setCountry(ipAddress.getData().getCountry());
-            result.setIsp(ipAddress.getData().getIsp());
+            if(ipAddress.getCode()==0) {
+                result.setSuccess(true);
+                result.setProvince(ipAddress.getData().getRegion());
+                result.setCity(ipAddress.getData().getCity());
+                result.setCountry(ipAddress.getData().getCountry());
+                result.setIsp(ipAddress.getData().getIsp());
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }
