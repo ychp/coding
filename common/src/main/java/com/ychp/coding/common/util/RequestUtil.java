@@ -1,6 +1,8 @@
 package com.ychp.coding.common.util;
 
+import com.ychp.coding.common.model.BaiduIpAddress;
 import com.ychp.coding.common.model.IpAddress;
+import com.ychp.coding.common.model.TaobaoIpAddress;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.BufferedReader;
@@ -15,6 +17,12 @@ import java.net.URL;
  * Date: 16/8/23
  */
 public class RequestUtil {
+
+    private static final String BAIDU_IP_API_URL = "http://apis.baidu.com/apistore/iplookupservice/iplookup";
+
+    private static final String TAOBAO_IP_API_URL = "http://ip.taobao.com/service/getIpInfo.php";
+
+    private static final String BAIDU_API_KEY = "24bd43016ccf30255ceac63669d7684c";
 
     public static String getIp(HttpServletRequest request){
         String ip = request.getHeader("x-forwarded-for");
@@ -34,28 +42,26 @@ public class RequestUtil {
         return request.getRemoteHost();
     }
 
-    private static final String httpUrl = "http://apis.baidu.com/apistore/iplookupservice/iplookup";
-
-    private static final String apiKey = "24bd43016ccf30255ceac63669d7684c";
 
     /**
      * @param httpArg
      *            :参数
      * @return 返回结果
      */
-    public static IpAddress getIpAddress(String httpArg) {
+    public static IpAddress baiduIpAddress(String httpArg) {
         BufferedReader reader = null;
-        String result = null;
+        String str = null;
         StringBuffer sbf = new StringBuffer();
-        String requestUrl = httpUrl + "?" + httpArg;
-        IpAddress ipAddress = null;
+        String requestUrl = BAIDU_IP_API_URL + "?" + httpArg;
+        BaiduIpAddress ipAddress = null;
+        IpAddress result = new IpAddress();
         try {
             URL url = new URL(requestUrl);
             HttpURLConnection connection = (HttpURLConnection) url
                     .openConnection();
             connection.setRequestMethod("GET");
             // 填入apikey到HTTP header
-            connection.setRequestProperty("apikey",  apiKey);
+            connection.setRequestProperty("apikey",  BAIDU_API_KEY);
             connection.connect();
             InputStream is = connection.getInputStream();
             reader = new BufferedReader(new InputStreamReader(is, "UTF-8"));
@@ -65,12 +71,55 @@ public class RequestUtil {
                 sbf.append("\r\n");
             }
             reader.close();
-            result = sbf.toString();
-            ipAddress = JsonMapper.JSON_NON_DEFAULT_MAPPER.fromJson(result, IpAddress.class);
+            str = sbf.toString();
+            ipAddress = JsonMapper.JSON_NON_DEFAULT_MAPPER.fromJson(str, BaiduIpAddress.class);
+            result.setProvince(ipAddress.getRetData().getProvince());
+            result.setCity(ipAddress.getRetData().getCity());
+            result.setCountry(ipAddress.getRetData().getCountry());
+            result.setIsp(ipAddress.getRetData().getCarrier());
         } catch (Exception e) {
             e.printStackTrace();
         }
-        return ipAddress;
+        return result;
+    }
+
+    /**
+     * @param httpArg
+     *            :参数
+     * @return 返回结果
+     */
+    public static IpAddress taobaoIpAddress(String httpArg) {
+        BufferedReader reader = null;
+        String str = null;
+        StringBuffer sbf = new StringBuffer();
+        String requestUrl = TAOBAO_IP_API_URL + "?" + httpArg;
+        TaobaoIpAddress ipAddress = null;
+        IpAddress result = new IpAddress();
+        try {
+            URL url = new URL(requestUrl);
+            HttpURLConnection connection = (HttpURLConnection) url
+                    .openConnection();
+            connection.setRequestMethod("GET");
+            // 填入apikey到HTTP header
+            connection.connect();
+            InputStream is = connection.getInputStream();
+            reader = new BufferedReader(new InputStreamReader(is, "UTF-8"));
+            String strRead = null;
+            while ((strRead = reader.readLine()) != null) {
+                sbf.append(strRead);
+                sbf.append("\r\n");
+            }
+            reader.close();
+            str = sbf.toString();
+            ipAddress = JsonMapper.JSON_NON_DEFAULT_MAPPER.fromJson(str, TaobaoIpAddress.class);
+            result.setProvince(ipAddress.getData().getRegion());
+            result.setCity(ipAddress.getData().getCity());
+            result.setCountry(ipAddress.getData().getCountry());
+            result.setIsp(ipAddress.getData().getIsp());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return result;
     }
 
 }

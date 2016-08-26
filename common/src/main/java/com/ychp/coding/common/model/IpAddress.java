@@ -5,30 +5,17 @@ import lombok.Data;
 /**
  * Desc:
  * Author: <a href="ychp@terminus.io">应程鹏</a>
- * Date: 16/8/25
+ * Date: 16/8/26
  */
 @Data
 public class IpAddress {
 
-    private Integer errNum;
+    private String country;
 
-    private String errMsg;
+    private String province;
 
-    private RetData retData;
+    private String city;
 
-    @Data
-    public class RetData{
+    private String isp;
 
-        private String ip;
-
-        private String country;
-
-        private String province;
-
-        private String city;
-
-        private String district;
-
-        private String carrier;
-    }
 }
