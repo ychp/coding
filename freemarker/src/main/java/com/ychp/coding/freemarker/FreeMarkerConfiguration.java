@@ -11,6 +11,7 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
 import org.springframework.ui.freemarker.FreeMarkerConfigurationFactory;
 import org.springframework.ui.freemarker.FreeMarkerConfigurationFactoryBean;
 import org.springframework.web.servlet.view.freemarker.FreeMarkerConfig;
@@ -29,6 +30,7 @@ import java.util.Properties;
  * Author: <a href="ychp@terminus.io">应程鹏</a>
  * Date: 16/7/30
  */
+@Primary
 @Configuration
 @ConditionalOnClass({freemarker.template.Configuration.class, FreeMarkerConfigurationFactory.class})
 @AutoConfigureAfter({WebMvcAutoConfiguration.class})

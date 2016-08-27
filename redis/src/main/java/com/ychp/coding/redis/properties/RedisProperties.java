@@ -21,13 +21,13 @@ public class RedisProperties {
 
     private String password;
 
-    @Value("spring.redis.pool.max-active")
+    @Value("${spring.redis.pool.max-active}")
     private String maxActive;
 
-    @Value("spring.redis.pool.max-idle")
+    @Value("${spring.redis.pool.max-idle}")
     private String maxIdle;
 
-    @Value("spring.redis.pool.max-wait")
+    @Value("${spring.redis.pool.max-wait}")
     private String maxWait;
 
     private String database;

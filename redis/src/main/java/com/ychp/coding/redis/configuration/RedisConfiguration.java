@@ -6,6 +6,7 @@ import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.data.redis.RedisProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
 import org.springframework.util.StringUtils;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
@@ -17,6 +18,7 @@ import redis.clients.util.Pool;
  * Author: <a href="ychp@terminus.io">应程鹏</a>
  * Date: 16/7/25
  */
+@Primary
 @Configuration
 @EnableAutoConfiguration
 public class RedisConfiguration{
