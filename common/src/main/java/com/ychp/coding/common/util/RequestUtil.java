@@ -6,6 +6,7 @@ import com.ychp.coding.common.model.BaiduIpAddress;
 import com.ychp.coding.common.model.IpAddress;
 import com.ychp.coding.common.model.SinaIpAddress;
 import com.ychp.coding.common.model.TaobaoIpAddress;
+import org.apache.commons.lang3.StringUtils;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.BufferedReader;
@@ -54,17 +55,25 @@ public class RequestUtil {
      * @return
      */
     public static IpAddress getIpAddress(String ip, Integer type, String apiKey){
+        IpAddress result;
         if(type == null){
-            return taobaoIpAddress(ip);
+            result = taobaoIpAddress(ip);
         }else if(Objects.equal(IPAPIType.BAIDU.value(), type)){
-            return baiduIpAddress(ip, apiKey);
+            result = baiduIpAddress(ip, apiKey);
         }else if(Objects.equal(IPAPIType.TAOBAO.value(), type)){
-            return taobaoIpAddress(ip);
+            result = taobaoIpAddress(ip);
         }else if(Objects.equal(IPAPIType.SINA.value(), type)){
-            return sinaIpAddress(ip);
+            result = sinaIpAddress(ip);
         }else{
-            return taobaoIpAddress(ip);
+            result = taobaoIpAddress(ip);
         }
+        if(StringUtils.isEmpty(result.getProvince())){
+            result.setProvince(result.getCountry());
+        }
+        if(StringUtils.isEmpty(result.getCity())){
+            result.setCity(result.getCountry());
+        }
+        return result;
     }
 
 
@@ -84,6 +93,7 @@ public class RequestUtil {
             result.setCountry(ipAddress.getRetData().getCountry());
             result.setIsp(ipAddress.getRetData().getCarrier());
         }
+
         return result;
     }
 
