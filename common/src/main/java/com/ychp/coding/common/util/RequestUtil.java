@@ -6,6 +6,7 @@ import com.ychp.coding.common.model.BaiduIpAddress;
 import com.ychp.coding.common.model.IpAddress;
 import com.ychp.coding.common.model.SinaIpAddress;
 import com.ychp.coding.common.model.TaobaoIpAddress;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 
 import javax.servlet.http.HttpServletRequest;
@@ -22,6 +23,7 @@ import static com.ychp.coding.common.enums.IPAPIType.BAIDU;
  * Author: <a href="ychp@terminus.io">应程鹏</a>
  * Date: 16/8/23
  */
+@Slf4j
 public class RequestUtil {
 
     private static final String BAIDU_IP_API_URL = "http://apis.baidu.com/apistore/iplookupservice/iplookup?ip=";
@@ -88,10 +90,14 @@ public class RequestUtil {
         BaiduIpAddress ipAddress = JsonMapper.JSON_NON_DEFAULT_MAPPER.fromJson(str, BaiduIpAddress.class);
         if(ipAddress.getErrNum() == 0) {
             result.setSuccess(true);
-            result.setProvince(ipAddress.getRetData().getProvince());
-            result.setCity(ipAddress.getRetData().getCity());
-            result.setCountry(ipAddress.getRetData().getCountry());
-            result.setIsp(ipAddress.getRetData().getCarrier());
+            if(ipAddress.getRetData() != null) {
+                result.setProvince(ipAddress.getRetData().getProvince());
+                result.setCity(ipAddress.getRetData().getCity());
+                result.setCountry(ipAddress.getRetData().getCountry());
+                result.setIsp(ipAddress.getRetData().getCarrier());
+            }else{
+                log.info("ipAddress : {}", ipAddress);
+            }
         }
 
         return result;
@@ -108,10 +114,14 @@ public class RequestUtil {
         TaobaoIpAddress ipAddress = JsonMapper.JSON_NON_DEFAULT_MAPPER.fromJson(str, TaobaoIpAddress.class);
         if(ipAddress.getCode()==0) {
             result.setSuccess(true);
-            result.setProvince(ipAddress.getData().getRegion());
-            result.setCity(ipAddress.getData().getCity());
-            result.setCountry(ipAddress.getData().getCountry());
-            result.setIsp(ipAddress.getData().getIsp());
+            if(ipAddress.getData() != null){
+                result.setProvince(ipAddress.getData().getRegion());
+                result.setCity(ipAddress.getData().getCity());
+                result.setCountry(ipAddress.getData().getCountry());
+                result.setIsp(ipAddress.getData().getIsp());
+            }else{
+                log.info("ipAddress : {}", ipAddress);
+            }
         }
         return result;
     }
