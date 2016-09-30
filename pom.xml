@@ -14,6 +14,7 @@
         <module>redis</module>
         <module>freemarker</module>
         <module>web-mvc</module>
+        <module>log-parser</module>
     </modules>
 
     <properties>
@@ -29,6 +30,10 @@
         <jackson.version>2.6.7</jackson.version>
         <slf4j.version>1.7.20</slf4j.version>
         <servlet-api.version>3.1.0</servlet-api.version>
+        <dubbo.version>2.5.3</dubbo.version>
+        <zkclient.version>0.1</zkclient.version>
+        <zookeeper.version>3.4.6</zookeeper.version>
+        <guava.version>18.0</guava.version>
     </properties>
 
     <dependencies>
@@ -42,6 +47,12 @@
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
             <version>${slf4j.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+            <version>${guava.version}</version>
         </dependency>
 
         <dependency>
