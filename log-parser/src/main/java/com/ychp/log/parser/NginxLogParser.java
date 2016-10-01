@@ -4,9 +4,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.ychp.log.model.Nginx;
 import com.ychp.log.model.UserAgent;
-import cz.mallat.uasparser.OnlineUpdater;
-import cz.mallat.uasparser.UASparser;
-import cz.mallat.uasparser.UserAgentInfo;
+import com.ychp.log.utils.UaUtil;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
@@ -59,20 +57,8 @@ public class NginxLogParser extends Parser<Nginx> {
         }
         nginx.setUa(strArr[5]);
 
-        try {
-            UserAgentInfo userAgentInfo = new UASparser(OnlineUpdater.getVendoredInputStream()).parse(nginx.getUa());
-            UserAgent userAgent = new UserAgent();
-            userAgent.setSystem(userAgentInfo.getOsFamily());
-            userAgent.setSystemName(userAgentInfo.getOsName());
-            userAgent.setBrowserName(userAgentInfo.getUaFamily());
-            userAgent.setBrowserVersion(userAgentInfo.getBrowserVersionInfo());
-            userAgent.setDevice(userAgentInfo.getDeviceType());
-            userAgent.setBrowser(userAgentInfo.getUaName());
-            userAgent.setType(userAgentInfo.getType());
-            nginx.setUserAgent(userAgent);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        UserAgent userAgent = UaUtil.parseUa(nginx.getUa());
+        nginx.setUserAgent(userAgent);
 
         return nginx;
     }
