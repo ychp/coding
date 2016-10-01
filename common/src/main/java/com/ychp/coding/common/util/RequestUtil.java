@@ -6,6 +6,9 @@ import com.ychp.coding.common.model.BaiduIpAddress;
 import com.ychp.coding.common.model.IpAddress;
 import com.ychp.coding.common.model.SinaIpAddress;
 import com.ychp.coding.common.model.TaobaoIpAddress;
+import com.ychp.log.model.UserAgent;
+import com.ychp.log.utils.UaUtil;
+import cz.mallat.uasparser.UserAgentInfo;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 
@@ -88,7 +91,7 @@ public class RequestUtil {
         IpAddress result = new IpAddress();
         String str = get(BAIDU_IP_API_URL + ip, true, apiKey);
         BaiduIpAddress ipAddress = JsonMapper.JSON_NON_DEFAULT_MAPPER.fromJson(str, BaiduIpAddress.class);
-        if(ipAddress.getErrNum() == 0) {
+        if(ipAddress != null  && ipAddress.getErrNum() == 0) {
             result.setSuccess(true);
             if(ipAddress.getRetData() != null) {
                 result.setProvince(ipAddress.getRetData().getProvince());
@@ -112,7 +115,7 @@ public class RequestUtil {
         IpAddress result = new IpAddress();
         String str = get(TAOBAO_IP_API_URL + ip, false, null);
         TaobaoIpAddress ipAddress = JsonMapper.JSON_NON_DEFAULT_MAPPER.fromJson(str, TaobaoIpAddress.class);
-        if(ipAddress.getCode()==0) {
+        if(ipAddress != null  && ipAddress.getCode()==0) {
             result.setSuccess(true);
             if(ipAddress.getData() != null){
                 result.setProvince(ipAddress.getData().getRegion());
@@ -135,7 +138,7 @@ public class RequestUtil {
         IpAddress result = new IpAddress();
         String str = get(SINA_IP_API_URL + ip, false, null);
         SinaIpAddress ipAddress = JsonMapper.JSON_NON_DEFAULT_MAPPER.fromJson(str, SinaIpAddress.class);
-        if(ipAddress.getRet()==1) {
+        if(ipAddress != null  && ipAddress.getRet()==1) {
             result.setSuccess(true);
             result.setProvince(ipAddress.getProvince());
             result.setCity(ipAddress.getCity());
@@ -172,6 +175,18 @@ public class RequestUtil {
             e.printStackTrace();
         }
         return str;
+    }
+
+    public static UserAgent getUaInfo(HttpServletRequest request){
+        String ua = request.getHeader("User-Agent");
+        UserAgent userAgent = UaUtil.parseUa(ua);
+        userAgent = userAgent == null ? new UserAgent() : userAgent;
+        return userAgent;
+    }
+
+    public static String getUrl(HttpServletRequest request){
+        String url = request.getRequestURL().toString();
+        return  url;
     }
 
 }
