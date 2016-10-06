@@ -15,6 +15,26 @@ public class Response<T> implements Serializable{
 
     private Boolean success = false;
 
+    public static Response ok(Object result){
+        return new Response(result);
+    }
+
+    public static Response fail(String error){
+        return new Response(error);
+    }
+
+    public Response(){}
+
+    private Response(T result){
+        success = true;
+        this.result = result;
+    }
+
+    private Response(String error){
+        success = false;
+        this.error = error;
+    }
+
     @Getter
     private String error;
 
