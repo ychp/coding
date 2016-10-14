@@ -11,6 +11,7 @@ import java.util.List;
  */
 public class DefaultParser extends BaseParser<BaseData> {
 
+
     public void printDatas(List<BaseData> datas){
         for(BaseData data : datas) {
             System.out.println(data);

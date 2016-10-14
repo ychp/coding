@@ -2,14 +2,13 @@ package com.ychp.spider.parser;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
 import com.ychp.spider.enums.ScanType;
 import com.ychp.spider.model.BaseData;
 import com.ychp.spider.model.Rule;
 import com.ychp.spider.utils.HttpRequest;
+import com.ychp.spider.utils.ParserUtils;
 import lombok.Getter;
 import lombok.Setter;
-import org.apache.commons.lang3.StringUtils;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Node;
@@ -19,7 +18,6 @@ import java.io.InputStream;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
-import java.util.Set;
 
 /**
  * Desc:
@@ -28,79 +26,44 @@ import java.util.Set;
  */
 public abstract class BaseParser<T extends BaseData> {
 
-    @Setter
-    protected Rule rule;
-
     @Getter
     @Setter
     protected String configPrex;
 
-    protected List<String> defaultTag = Lists.newArrayList();
-
-    protected List<String> defaultVideo = Lists.newArrayList();
-
-    protected List<String> defaultImage = Lists.newArrayList();
-
-    protected List<String> defaultText = Lists.newArrayList();
-
-    protected List<String> defaultSubTag = Lists.newArrayList();
-
     public BaseParser(){
         initConfigPrex();
-        initRule();
     }
 
     protected abstract void initConfigPrex();
 
-    protected void initRule(){
-        Properties prop = new Properties();
-        InputStream in = Object.class.getResourceAsStream("/rules.properties");
-        try {
-            if(in != null){
-                prop.load(in);
-                rule = new Rule();
-                rule.setUrlRegx(prop.getProperty("spider.rule.url-" + configPrex).trim());
-                String keyStr = prop.getProperty("spider.rule.keyword-" + configPrex);
-                rule.setKeyWords(keyStr);
-                if(!StringUtils.isEmpty(keyStr)){
-                    List<String> tagTypes = Lists.newArrayList(keyStr.trim().split(","));
-                    rule.setKeyWord(tagTypes);
-                }
-                String videoStr = prop.getProperty("spider.rule.video-" + configPrex);
-                if(!StringUtils.isEmpty(videoStr)){
-                    List<String> tagTypes = Lists.newArrayList(videoStr.trim().split(","));
-                    rule.setVideoTag(tagTypes);
-                }
-                String imageStr = prop.getProperty("spider.rule.image-" + configPrex);
-                if(!StringUtils.isEmpty(imageStr)){
-                    List<String> tagTypes = Lists.newArrayList(imageStr.trim().split(","));
-                    rule.setImageTag(tagTypes);
-                }
-                String textStr = prop.getProperty("spider.rule.text-" + configPrex);
-                if(!StringUtils.isEmpty(textStr)){
-                    List<String> tagTypes = Lists.newArrayList(textStr.trim().split(","));
-                    rule.setTextTag(tagTypes);
-                }
-                String subTag = prop.getProperty("spider.rule.subTag-" + configPrex);
-                if(!StringUtils.isEmpty(subTag)){
-                    List<String> tagTypes = Lists.newArrayList(subTag.trim().split(","));
-                    rule.setSubTag(tagTypes);
-                }
-                Set<String> tags = Sets.newHashSet();
-                tags.addAll(rule.getVideoTag());
-                tags.addAll(rule.getImageTag());
-                tags.addAll(rule.getTextTag());
-                tags.addAll(rule.getSubTag());
-                defaultTag.addAll(tags);
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
+    protected Rule initRule(Map<String, String> ruleValues){
+        if(ruleValues == null){
+            ruleValues = Maps.newHashMap();
         }
+        if(ruleValues.isEmpty()) {
+            Properties prop = new Properties();
+            InputStream in = Object.class.getResourceAsStream("/rules.properties");
+            try {
+                if (in != null) {
+                    prop.load(in);
+                    ruleValues.put("url", prop.getProperty("spider.rule.url-" + configPrex).trim());
+                    ruleValues.put("keywords", prop.getProperty("spider.rule.keyword-" + configPrex).trim());
+                    ruleValues.put("videoTag", prop.getProperty("spider.rule.video-" + configPrex).trim());
+                    ruleValues.put("imageTag", prop.getProperty("spider.rule.image-" + configPrex).trim());
+                    ruleValues.put("textTag", prop.getProperty("spider.rule.text-" + configPrex).trim());
+                    ruleValues.put("subTag", prop.getProperty("spider.rule.subTag-" + configPrex).trim());
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        Rule rule = ParserUtils.getRule(ruleValues);
+        return rule;
     }
 
-    public List<Node> generateTag(String html){
+    public List<Node> generateTag(String html, Rule rule){
         Map<String, List<Node>> tagMaps = generateMaps(html);
-        return generateTagContent(tagMaps);
+        return generateTagContent(tagMaps, rule);
     }
 
     protected Map<String,List<Node>> generateMaps(String html){
@@ -135,9 +98,9 @@ public abstract class BaseParser<T extends BaseData> {
         }
     }
 
-    public List<Node> generateTagContent(Map<String,List<Node>> tagMaps){
+    public List<Node> generateTagContent(Map<String,List<Node>> tagMaps, Rule rule){
         List<Node> result = Lists.newArrayList();
-        List<String> tag = defaultTag;
+        List<String> tag = rule.getTags();
         for(String tagType : tag){
             if(tagMaps.get(tagType) != null) {
                 result.addAll(tagMaps.get(tagType));
@@ -146,31 +109,28 @@ public abstract class BaseParser<T extends BaseData> {
         return result;
     }
 
-    public List<Map<String, Object>> getDatas(String html){
-        List<Node> tags = generateTag(html);
+    public List<Map<String, Object>> getDatas(String html, Rule rule){
+        List<Node> tags = generateTag(html, rule);
         List<Map<String, Object>> results = Lists.newArrayList();
         for(Node tag : tags){
-            results.add(getOneResult(tag));
+            results.add(getOneResult(tag, rule));
         }
         return results;
     }
 
-    public Map<String, Object> getOneResult(Node node){
+    public Map<String, Object> getOneResult(Node node, Rule rule){
         Map<String, Object> result = Maps.newHashMap();
-        result.put("videos", getVideos(node));
-        result.put("images", getImages(node));
-        result.put("text", getText(node));
-        result.put("subTags", getSubTags(node));
+        result.put("videos", getVideos(node, rule));
+        result.put("images", getImages(node, rule));
+        result.put("text", getText(node, rule));
+        result.put("subTags", getSubTags(node, rule));
         result.put("dataRef", rule.getUrlRegx());
         return result;
     }
 
-    public List<Map<String,String>> getVideos(Node node){
+    public List<Map<String,String>> getVideos(Node node, Rule rule){
         List<Map<String,String>> result = Lists.newArrayList();
-        List<String> video = defaultVideo;
-        if(!rule.getVideoTag().isEmpty()){
-            video = rule.getVideoTag();
-        }
+        List<String> video = rule.getVideoTag();
         if(containType(node, video)){
             Map<String,String> item = Maps.newHashMap();
             item.put("content", node.attr("source"));
@@ -181,12 +141,9 @@ public abstract class BaseParser<T extends BaseData> {
         return result;
     }
 
-    public List<Map<String,String>> getImages(Node node){
+    public List<Map<String,String>> getImages(Node node, Rule rule){
         List<Map<String,String>> result = Lists.newArrayList();
-        List<String> image = defaultImage;
-        if(!rule.getImageTag().isEmpty()){
-            image = rule.getImageTag();
-        }
+        List<String> image = rule.getImageTag();
         if(containType(node, image)){
             Map<String,String> item = Maps.newHashMap();
             item.put("content", node.attr("src"));
@@ -196,12 +153,9 @@ public abstract class BaseParser<T extends BaseData> {
         return result;
     }
 
-    public List<Map<String,String>> getText(Node node){
+    public List<Map<String,String>> getText(Node node, Rule rule){
         List<Map<String,String>> result = Lists.newArrayList();
-        List<String> text = defaultText;
-        if(!rule.getTextTag().isEmpty()){
-            text = rule.getTextTag();
-        }
+        List<String> text = rule.getTextTag();
         if(containType(node, text)){
             Map<String,String> item = Maps.newHashMap();
             String textContent = node.outerHtml();
@@ -232,12 +186,9 @@ public abstract class BaseParser<T extends BaseData> {
         return false;
     }
 
-    public List<Map<String,String>> getSubTags(Node node){
+    public List<Map<String,String>> getSubTags(Node node, Rule rule){
         List<Map<String,String>> result = Lists.newArrayList();
-        List<String> tags = defaultSubTag;
-        if(!rule.getSubTag().isEmpty()){
-            tags = rule.getSubTag();
-        }
+        List<String> tags = rule.getSubTag();
         if(containType(node, tags)){
             Map<String,String> item = Maps.newHashMap();
             String textContent = node.outerHtml();
@@ -261,13 +212,13 @@ public abstract class BaseParser<T extends BaseData> {
         return false;
     }
 
-    public List<T> makeResult(List<Map<String, Object>> datas){
+    public List<T> makeResult(List<Map<String, Object>> datas, Rule rule){
         List<T> result = Lists.newArrayList();
         for(Map<String, Object> item : datas){
-            result.addAll(makeVideoResult((List<Map<String,String>>)item.get("videos")));
-            result.addAll(makeImageResult((List<Map<String,String>>)item.get("images")));
-            result.addAll(makeTextResult((List<Map<String,String>>)item.get("text")));
-            result.addAll(makeSubTagResult((List<Map<String,String>>)item.get("subTags")));
+            result.addAll(makeVideoResult((List<Map<String,String>>)item.get("videos"), rule));
+            result.addAll(makeImageResult((List<Map<String,String>>)item.get("images"), rule));
+            result.addAll(makeTextResult((List<Map<String,String>>)item.get("text"), rule));
+            result.addAll(makeSubTagResult((List<Map<String,String>>)item.get("subTags"), rule));
             String dataRef = (String)item.get("dataRef");
             setDataRef(result, dataRef);
         }
@@ -280,7 +231,7 @@ public abstract class BaseParser<T extends BaseData> {
         }
     }
 
-    public List<T> makeVideoResult(List<Map<String,String>> datas){
+    public List<T> makeVideoResult(List<Map<String,String>> datas, Rule rule){
         List<T> result = Lists.newArrayList();
         if(datas != null){
             T data;
@@ -296,7 +247,7 @@ public abstract class BaseParser<T extends BaseData> {
         return result;
     }
 
-    public List<T> makeImageResult(List<Map<String,String>> datas){
+    public List<T> makeImageResult(List<Map<String,String>> datas, Rule rule){
         List<T> result = Lists.newArrayList();
         if(datas != null){
             T data;
@@ -312,7 +263,7 @@ public abstract class BaseParser<T extends BaseData> {
         return result;
     }
 
-    public List<T> makeTextResult(List<Map<String,String>> datas){
+    public List<T> makeTextResult(List<Map<String,String>> datas, Rule rule){
         List<T> result = Lists.newArrayList();
         if(datas != null) {
             T data;
@@ -328,7 +279,7 @@ public abstract class BaseParser<T extends BaseData> {
         return result;
     }
 
-    public List<T> makeSubTagResult(List<Map<String,String>> datas){
+    public List<T> makeSubTagResult(List<Map<String,String>> datas, Rule rule){
         List<T> result = Lists.newArrayList();
         if(datas != null) {
             T data;
@@ -343,7 +294,8 @@ public abstract class BaseParser<T extends BaseData> {
         return result;
     }
 
-    public List<T> parseContext(){
+    public List<T> parseContext(Map<String, String> ruleValues){
+        Rule rule = initRule(ruleValues);
         String url = rule.getUrlRegx();
         if(url.startsWith("https")){
             url = "http" + url.substring(5);
@@ -351,8 +303,12 @@ public abstract class BaseParser<T extends BaseData> {
         String html = HttpRequest.sendGet(url, "");
         html = removeUselessContent(html);
         System.out.println(html);
-        List<Map<String, Object>> datas = getDatas(html);
-        return makeResult(datas);
+        List<Map<String, Object>> datas = getDatas(html, rule);
+        return makeResult(datas, rule);
+    }
+
+    public List<T> parseContext(){
+        return parseContext(null);
     }
 
     protected String removeUselessContent(String html){
