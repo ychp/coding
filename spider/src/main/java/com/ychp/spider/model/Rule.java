@@ -17,8 +17,6 @@ public class Rule {
 
     private List<String> keyWord = Lists.newArrayList();
 
-    private List<String> tagType = Lists.newArrayList();
-
     private List<String> videoTag = Lists.newArrayList();
 
     private List<String> imageTag = Lists.newArrayList();
