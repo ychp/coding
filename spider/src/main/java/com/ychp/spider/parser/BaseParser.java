@@ -2,6 +2,7 @@ package com.ychp.spider.parser;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 import com.ychp.spider.enums.ScanType;
 import com.ychp.spider.model.BaseData;
 import com.ychp.spider.model.Rule;
@@ -18,6 +19,7 @@ import java.io.InputStream;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.Set;
 
 /**
  * Desc:
@@ -33,15 +35,15 @@ public abstract class BaseParser<T extends BaseData> {
     @Setter
     protected String configPrex;
 
-    protected List<String> defaultTag = Lists.newArrayList("div");
+    protected List<String> defaultTag = Lists.newArrayList();
 
-    protected List<String> defaultVideo = Lists.newArrayList("video", "flash", "vdo");
+    protected List<String> defaultVideo = Lists.newArrayList();
 
-    protected List<String> defaultImage = Lists.newArrayList("img");
+    protected List<String> defaultImage = Lists.newArrayList();
 
-    protected List<String> defaultText = Lists.newArrayList("div");
+    protected List<String> defaultText = Lists.newArrayList();
 
-    protected List<String> defaultSubTag = Lists.newArrayList("div");
+    protected List<String> defaultSubTag = Lists.newArrayList();
 
     public BaseParser(){
         initConfigPrex();
@@ -64,11 +66,6 @@ public abstract class BaseParser<T extends BaseData> {
                     List<String> tagTypes = Lists.newArrayList(keyStr.trim().split(","));
                     rule.setKeyWord(tagTypes);
                 }
-                String tagTypeStr = prop.getProperty("spider.rule.tagType-" + configPrex);
-                if(!StringUtils.isEmpty(tagTypeStr)){
-                    List<String> tagTypes = Lists.newArrayList(tagTypeStr.trim().split(","));
-                    rule.setTagType(tagTypes);
-                }
                 String videoStr = prop.getProperty("spider.rule.video-" + configPrex);
                 if(!StringUtils.isEmpty(videoStr)){
                     List<String> tagTypes = Lists.newArrayList(videoStr.trim().split(","));
@@ -89,6 +86,12 @@ public abstract class BaseParser<T extends BaseData> {
                     List<String> tagTypes = Lists.newArrayList(subTag.trim().split(","));
                     rule.setSubTag(tagTypes);
                 }
+                Set<String> tags = Sets.newHashSet();
+                tags.addAll(rule.getVideoTag());
+                tags.addAll(rule.getImageTag());
+                tags.addAll(rule.getTextTag());
+                tags.addAll(rule.getSubTag());
+                defaultTag.addAll(tags);
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -135,9 +138,6 @@ public abstract class BaseParser<T extends BaseData> {
     public List<Node> generateTagContent(Map<String,List<Node>> tagMaps){
         List<Node> result = Lists.newArrayList();
         List<String> tag = defaultTag;
-        if(!rule.getTagType().isEmpty()) {
-            tag = rule.getTagType();
-        }
         for(String tagType : tag){
             if(tagMaps.get(tagType) != null) {
                 result.addAll(tagMaps.get(tagType));
