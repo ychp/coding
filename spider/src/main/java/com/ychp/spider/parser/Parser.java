@@ -289,6 +289,7 @@ public abstract class Parser<T extends SpiderData> {
                 data.setKeyword(rule.getKeyWords());
                 data.setType(ScanType.TAG.getValue());
                 data.setContent(item.get("content"));
+                data.setUrl(item.get("url"));
                 result.add(data);
             }
         }
