@@ -17,7 +17,6 @@
         <module>rpc</module>
         <module>log-parser</module>
         <module>spider</module>
-        <module>spring-boot-spider</module>
     </modules>
 
     <properties>

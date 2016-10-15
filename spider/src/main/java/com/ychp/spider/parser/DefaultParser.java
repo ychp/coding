@@ -1,6 +1,7 @@
 package com.ychp.spider.parser;
 
-import com.ychp.spider.model.BaseData;
+import com.ychp.spider.model.SpiderData;
+import org.springframework.stereotype.Component;
 
 import java.util.List;
 
@@ -9,11 +10,12 @@ import java.util.List;
  * Author: <a href="ychp@terminus.io">应程鹏</a>
  * Date: 16/10/12
  */
-public class DefaultParser extends BaseParser<BaseData> {
+@Component
+public class DefaultParser extends Parser<SpiderData> {
 
 
-    public void printDatas(List<BaseData> datas){
-        for(BaseData data : datas) {
+    public void printDatas(List<SpiderData> datas){
+        for(SpiderData data : datas) {
             System.out.println(data);
         }
     }
@@ -25,7 +27,7 @@ public class DefaultParser extends BaseParser<BaseData> {
 
     public static void main(String[] args){
         DefaultParser parser = new DefaultParser();
-        List<BaseData> datas = parser.parseContext();
+        List<SpiderData> datas = parser.parseContext();
         parser.printDatas(datas);
         System.out.println();
     }

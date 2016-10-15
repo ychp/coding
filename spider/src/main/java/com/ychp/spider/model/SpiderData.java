@@ -3,9 +3,18 @@ package com.ychp.spider.model;
 /**
  * Desc:
  * Author: <a href="ychp@terminus.io">应程鹏</a>
- * Date: 16/10/12
+ * Date: 16/10/13
  */
-public class SpiderData extends BaseData{
+@lombok.Data
+public class SpiderData {
 
+    private String dataRef;
 
+    private String content;
+
+    private String url;
+
+    private String keyword;
+
+    private String type;
 }
