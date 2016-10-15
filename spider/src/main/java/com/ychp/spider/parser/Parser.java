@@ -3,8 +3,8 @@ package com.ychp.spider.parser;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.ychp.spider.enums.ScanType;
-import com.ychp.spider.model.BaseData;
 import com.ychp.spider.model.Rule;
+import com.ychp.spider.model.SpiderData;
 import com.ychp.spider.utils.HttpRequest;
 import com.ychp.spider.utils.ParserUtils;
 import lombok.Getter;
@@ -24,13 +24,13 @@ import java.util.Properties;
  * Author: <a href="ychp@terminus.io">应程鹏</a>
  * Date: 16/10/12
  */
-public abstract class BaseParser<T extends BaseData> {
+public abstract class Parser<T extends SpiderData> {
 
     @Getter
     @Setter
     protected String configPrex;
 
-    public BaseParser(){
+    public Parser(){
         initConfigPrex();
     }
 
@@ -236,7 +236,7 @@ public abstract class BaseParser<T extends BaseData> {
         if(datas != null){
             T data;
             for(Map<String,String> item : datas) {
-                data = (T) new BaseData();
+                data = (T) new SpiderData();
                 data.setKeyword(rule.getKeyWords());
                 data.setType(ScanType.VIDEO.getValue());
                 data.setContent(item.get("content"));
@@ -252,7 +252,7 @@ public abstract class BaseParser<T extends BaseData> {
         if(datas != null){
             T data;
             for(Map<String,String> item : datas){
-                data = (T) new BaseData();
+                data = (T) new SpiderData();
                 data.setKeyword(rule.getKeyWords());
                 data.setType(ScanType.IMAGE.getValue());
                 data.setContent(item.get("content"));
@@ -268,7 +268,7 @@ public abstract class BaseParser<T extends BaseData> {
         if(datas != null) {
             T data;
             for (Map<String,String> item : datas) {
-                data = (T) new BaseData();
+                data = (T) new SpiderData();
                 data.setKeyword(rule.getKeyWords());
                 data.setType(ScanType.TEXT.getValue());
                 data.setContent(item.get("content"));
@@ -284,7 +284,7 @@ public abstract class BaseParser<T extends BaseData> {
         if(datas != null) {
             T data;
             for (Map<String,String> item : datas) {
-                data = (T) new BaseData();
+                data = (T) new SpiderData();
                 data.setKeyword(rule.getKeyWords());
                 data.setType(ScanType.TAG.getValue());
                 data.setContent(item.get("content"));
