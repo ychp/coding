@@ -194,6 +194,7 @@ public abstract class Parser<T extends SpiderData> {
             String textContent = node.outerHtml();
             if(containKeyWord(rule.getKeyWord(), textContent)) {
                 item.put("content", textContent);
+                item.put("url", node.attr("src"));
                 result.add(item);
             }
         }
