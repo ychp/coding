@@ -167,7 +167,10 @@ public abstract class Parser<T extends SpiderData> {
                 if (node.hasAttr("href")) {
                     item.put("url", node.attr("href"));
                 }
-                result.add(item);
+                if(item.get("url").matches("((http|ftp|https)://)(([a-zA-Z0-9\\._-]+\\.[a-zA-Z]{2,6})|([0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}))(:[0-9]{1,4})*(/[a-zA-Z0-9\\&%_\\./-~-]*)?")
+                        || item.get("url").matches("(/[a-zA-Z0-9\\&%_\\./-~-]*)[?]{0,1}")) {
+                    result.add(item);
+                }
             }
         }
         return result;
