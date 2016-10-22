@@ -246,6 +246,7 @@ public abstract class Parser<T extends SpiderData> {
                 data.setType(ScanType.VIDEO.getValue());
                 data.setContent(item.get("content"));
                 data.setUrl(item.get("url"));
+                data.setSource(rule.getUrlRegx());
                 result.add(data);
             }
         }
@@ -262,6 +263,7 @@ public abstract class Parser<T extends SpiderData> {
                 data.setType(ScanType.IMAGE.getValue());
                 data.setContent(item.get("content"));
                 data.setUrl(item.get("url"));
+                data.setSource(rule.getUrlRegx());
                 result.add(data);
             }
         }
@@ -278,6 +280,7 @@ public abstract class Parser<T extends SpiderData> {
                 data.setType(ScanType.TEXT.getValue());
                 data.setContent(item.get("content"));
                 data.setUrl(item.get("url"));
+                data.setSource(rule.getUrlRegx());
                 result.add(data);
             }
         }
@@ -294,6 +297,7 @@ public abstract class Parser<T extends SpiderData> {
                 data.setType(ScanType.TAG.getValue());
                 data.setContent(item.get("content"));
                 data.setUrl(item.get("url"));
+                data.setSource(rule.getUrlRegx());
                 result.add(data);
             }
         }

@@ -14,6 +14,8 @@ public class SpiderData {
 
     private String url;
 
+    private String source;
+
     private String keyword;
 
     private String type;
