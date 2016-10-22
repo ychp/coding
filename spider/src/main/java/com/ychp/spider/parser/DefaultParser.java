@@ -27,8 +27,7 @@ public class DefaultParser extends Parser<SpiderData> {
     }
 
     @Override
-    public List<SpiderData> spider(Map<String, String> ruleValues, String url) {
-        ruleValues.put("url", url);
+    public List<SpiderData> spider(Map<String, String> ruleValues) {
         return parseContext(ruleValues);
     }
 

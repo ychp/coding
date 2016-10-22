@@ -331,6 +331,6 @@ public abstract class Parser<T extends SpiderData> {
         return html;
     }
 
-    public abstract List<T>  spider(Map<String, String> ruleValues, String url);
+    public abstract List<T>  spider(Map<String, String> ruleValues);
 
 }
