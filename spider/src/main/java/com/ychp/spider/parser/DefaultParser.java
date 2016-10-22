@@ -4,6 +4,7 @@ import com.ychp.spider.model.SpiderData;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * Desc:
@@ -23,6 +24,12 @@ public class DefaultParser extends Parser<SpiderData> {
     @Override
     protected void initConfigPrex() {
         setConfigPrex("default");
+    }
+
+    @Override
+    public List<SpiderData> spider(Map<String, String> ruleValues, String url) {
+        ruleValues.put("url", url);
+        return parseContext(ruleValues);
     }
 
     public static void main(String[] args){

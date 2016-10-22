@@ -1,5 +1,6 @@
 package com.ychp.spider.parser;
 
+import com.google.common.cache.AbstractCache;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.ychp.spider.enums.ScanType;
@@ -302,12 +303,14 @@ public abstract class Parser<T extends SpiderData> {
     public List<T> parseContext(Map<String, String> ruleValues){
         Rule rule = initRule(ruleValues);
         String url = rule.getUrlRegx();
+        String html = "";
         if(url.startsWith("https")){
-            url = "http" + url.substring(5);
+            html = HttpRequest.getBySSL(url, "");
+        }else {
+            html = HttpRequest.sendGet(url, "");
         }
-        String html = HttpRequest.sendGet(url, "");
         html = removeUselessContent(html);
-        System.out.println(html);
+//        System.out.println(html);
         List<Map<String, Object>> datas = getDatas(html, rule);
         return makeResult(datas, rule);
     }
@@ -328,7 +331,6 @@ public abstract class Parser<T extends SpiderData> {
         return html;
     }
 
-    public static void main(String[] args){
+    public abstract List<T>  spider(Map<String, String> ruleValues, String url);
 
-    }
 }
