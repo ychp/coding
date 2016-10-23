@@ -16,6 +16,7 @@
         <module>web-mvc</module>
         <module>log-parser</module>
         <module>spider</module>
+        <module>image</module>
     </modules>
 
     <properties>
