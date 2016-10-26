@@ -329,7 +329,7 @@ public abstract class Parser<T extends SpiderData> {
                 html = html.substring(html.indexOf("<html"));
             }
             if(html.indexOf("<HTML") != -1) {
-                html = html.substring(html.indexOf("<html"));
+                html = html.substring(html.indexOf("<HTML"));
             }
         }
         return html;
