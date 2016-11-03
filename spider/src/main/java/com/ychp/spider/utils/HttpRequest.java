@@ -8,8 +8,6 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
-import java.util.List;
-import java.util.Map;
 
 /**
  * Desc:
@@ -41,7 +39,7 @@ public class HttpRequest {
             // 建立实际的连接
             connection.connect();
             // 获取所有响应头字段
-            Map<String, List<String>> map = connection.getHeaderFields();
+//            Map<String, List<String>> map = connection.getHeaderFields();
             // 遍历所有的响应头字段
 //            for (String key : map.keySet()) {
 //                System.out.println(key + "--->" + map.get(key));
@@ -163,7 +161,7 @@ public class HttpRequest {
                     return true;
                 }
             });
-            InputStream l_urlStream = con.getInputStream();;
+            InputStream l_urlStream = con.getInputStream();
             BufferedReader l_reader = new BufferedReader(new InputStreamReader(
                     l_urlStream));
             while ((sCurrentLine = l_reader.readLine()) != null) {

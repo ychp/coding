@@ -40,7 +40,7 @@ public class HttpUtil {
                 os.write(bs, 0, len);
             }
             result = true;
-        }catch (Exception e){
+        }catch (Exception ignored){
         }finally {
             // 完毕，关闭所有链接
             if(os != null){

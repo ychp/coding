@@ -23,7 +23,7 @@ public class NginxLogParser extends Parser<Nginx> {
     @Override
     public void parserAll(String path) {
         setFile(path);
-        String str = null;
+        String str;
         datas = Lists.newArrayList();
         try {
             while ((str = reader.readLine()) != null){
@@ -51,7 +51,7 @@ public class NginxLogParser extends Parser<Nginx> {
         nginx.setContentLength(Integer.valueOf(strArr[2].split(" ")[2]));
 
         nginx.setUrl(strArr[3]);
-        if(nginx.getUrl().indexOf("/")!=-1) {
+        if(nginx.getUrl().contains("/")) {
             String domain = nginx.getUrl().split("/")[2];
             nginx.setDomain(domain);
         }
@@ -177,10 +177,10 @@ public class NginxLogParser extends Parser<Nginx> {
         String line;
         try {
             for(Map.Entry<String,String> entry:uaWithIp.entrySet()){
-                boolean isTool = entry.getValue().toLowerCase().indexOf("curl") !=-1
-                        || entry.getValue().toLowerCase().indexOf("scrapy") !=-1
-                        || entry.getValue().toLowerCase().indexOf("httpclient") !=-1
-                        || entry.getValue().toLowerCase().indexOf("wget") !=-1;
+                boolean isTool = entry.getValue().toLowerCase().contains("curl")
+                        || entry.getValue().toLowerCase().contains("scrapy")
+                        || entry.getValue().toLowerCase().contains("httpclient")
+                        || entry.getValue().toLowerCase().contains("wget");
                 if(blackIp.contains(entry.getKey()) && !"_".equals(entry.getValue()) && !isTool) {
                     line = entry.getValue() + "|";
                     writer.write(line);

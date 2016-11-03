@@ -67,7 +67,6 @@ public class XmlFactoryUtil {
             System.out.println();
 
         }
-        return;
     }
 
     private static void factoryModelXml(Class<?> model, List<String> columns, String packagePath) {

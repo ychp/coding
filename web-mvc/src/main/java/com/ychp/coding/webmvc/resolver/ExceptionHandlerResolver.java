@@ -61,20 +61,19 @@ public class ExceptionHandlerResolver extends ExceptionHandlerExceptionResolver 
                     return new ModelAndView(this.defaultErrorView, ImmutableMap.of("status", responseStatusAnn.value().value(), "message", responseStatusAnn.reason()));
 
                 }
-                if (Objects.equals(request.getHeader(HttpHeaders.X_REQUESTED_WITH), "XMLHttpRequest") || responseBodyAnn != null) {   //ajax or restful request
-                    PrintWriter out = null;
-                    try {
-                        response.setContentType(MediaType.JSON_UTF_8.toString());
-                        response.setStatus(status);
-                        out = response.getWriter();
-                        out.print(message);
-                        return null;
-                    } catch (Exception e) {
-                        return null;
-                    } finally {
-                        if (out != null) {
-                            out.close();
-                        }
+                //ajax or restful request
+                PrintWriter out = null;
+                try {
+                    response.setContentType(MediaType.JSON_UTF_8.toString());
+                    response.setStatus(status);
+                    out = response.getWriter();
+                    out.print(message);
+                    return null;
+                } catch (Exception e) {
+                    return null;
+                } finally {
+                    if (out != null) {
+                        out.close();
                     }
                 }
             } catch (Exception e) {

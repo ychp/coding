@@ -22,8 +22,7 @@ public class DefaultWriter extends Writer {
     public String writeImage(String url, String subPath, String name) {
         Boolean isSuccess = HttpUtil.saveImage(url, imageProperties.getPath() + File.separator + subPath, name);
         if(isSuccess){
-            String path = imageProperties.getImageUrl() + "/" + subPath + "/" +name;
-            return path;
+            return imageProperties.getImageUrl() + "/" + subPath + "/" +name;
         }
         return null;
     }

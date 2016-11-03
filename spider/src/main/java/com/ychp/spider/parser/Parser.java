@@ -58,8 +58,7 @@ public abstract class Parser<T extends SpiderData> {
                 e.printStackTrace();
             }
         }
-        Rule rule = ParserUtils.getRule(ruleValues);
-        return rule;
+        return ParserUtils.getRule(ruleValues);
     }
 
     public List<Node> generateTag(String html, Rule rule){
@@ -85,7 +84,7 @@ public abstract class Parser<T extends SpiderData> {
     }
 
     protected void putAllTags(List<Node> allTags, Node node){
-        if(node.nodeName().indexOf("root") != -1){
+        if(node.nodeName().contains("root")){
             for(Node child : node.childNodes()){
                 putAllTags(allTags, child);
             }
@@ -210,7 +209,7 @@ public abstract class Parser<T extends SpiderData> {
         String tagName;
         tagName = node.nodeName().toLowerCase();
         for (String reg : regs){
-            if(tagName.matches(reg) || tagName.indexOf(reg) != -1){
+            if(tagName.matches(reg) || tagName.contains(reg)){
                 return true;
             }
         }
@@ -325,10 +324,10 @@ public abstract class Parser<T extends SpiderData> {
 
     protected String removeUselessContent(String html){
         if(!html.startsWith("<html") || !html.startsWith("<HTML")){
-            if(html.indexOf("<html") != -1) {
+            if(html.contains("<html")) {
                 html = html.substring(html.indexOf("<html"));
             }
-            if(html.indexOf("<HTML") != -1) {
+            if(html.contains("<HTML")) {
                 html = html.substring(html.indexOf("<HTML"));
             }
         }

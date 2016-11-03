@@ -15,10 +15,10 @@ import org.springframework.stereotype.Component;
 @ConfigurationProperties()
 public class Configs {
 
-    @Value("${api.ip.address.type}")
+    @Value(value = "${api.ip.address.type}")
     private Integer ipAdressApiType;
 
-    @Value("${api.ip.address.apiKey}")
+    @Value(value = "${api.ip.address.apiKey}")
     private String ipAdressApiKey;
 
 }
