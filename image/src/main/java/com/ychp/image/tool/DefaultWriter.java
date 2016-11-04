@@ -26,4 +26,14 @@ public class DefaultWriter extends Writer {
         }
         return null;
     }
+
+    @Override
+    public Boolean deleteImage(String url) {
+        String path = url.replace(imageProperties.getImageUrl(), imageProperties.getPath());
+        File file = new File(path);
+        if(file.exists()){
+            return file.delete();
+        }
+        return false;
+    }
 }

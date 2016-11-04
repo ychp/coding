@@ -62,7 +62,7 @@ public class Encryption {
 
         System.arraycopy(bkey, 0, bkey24, 0, start);
 
-        System.arraycopy(bkey, start, bkey24, start, KEY_LENGTH - start);
+        System.arraycopy(bkey, 0, bkey24, start, KEY_LENGTH - start);
 
         return bkey24;
     }
@@ -200,19 +200,14 @@ public class Encryption {
 
 
     public static void main(String[] args) throws Exception {
-        String salt = getSalt();
+        String salt = "grqx5iCM2Ma8KT9x1hja6acW";
         System.out.println("key:" + salt);
-        String password = "123456";
+        String password = "IgfaPc3ZFfgMFBIvzg5g";
         password = Encrypt3DES(password, salt);
         System.out.println("password:" + password);
         password = Decrypt3DES(password, salt);
         System.out.println("origin_password:" + password);
 
-        String password1 = "123456";
-        password1 = Encrypt3DES(password1, salt);
-        System.out.println("password1:" + password1);
-        password1 = Decrypt3DES(password1, salt);
-        System.out.println("origin_password:" + password1);
 
     }
 

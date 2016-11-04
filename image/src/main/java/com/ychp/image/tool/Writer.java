@@ -8,4 +8,6 @@ package com.ychp.image.tool;
 public abstract class Writer {
 
     public abstract String writeImage(String url, String subPath, String name);
+
+    public abstract Boolean deleteImage(String url);
 }
