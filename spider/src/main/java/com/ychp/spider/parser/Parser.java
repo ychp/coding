@@ -1,6 +1,5 @@
 package com.ychp.spider.parser;
 
-import com.google.common.cache.AbstractCache;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.ychp.spider.enums.ScanType;

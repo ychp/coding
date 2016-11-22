@@ -1,7 +1,5 @@
 package com.ychp.spider.enums;
 
-import lombok.Data;
-
 /**
  * Desc:
  * Author: <a href="ychp@terminus.io">应程鹏</a>
