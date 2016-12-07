@@ -4,8 +4,7 @@ import com.google.common.collect.Lists;
 import lombok.Getter;
 
 import java.io.*;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Desc:
@@ -14,23 +13,22 @@ import java.util.Map;
  */
 public abstract class Parser<T> {
 
-    protected BufferedReader reader;
+    private BufferedReader reader;
 
-    protected BufferedWriter writer;
+    @Getter
+    private BufferedWriter writer;
 
     @Getter
     protected List<T> datas;
 
     @Getter
-    protected Map<String,Object> summaryDatas;
+    protected Map<String,Map<String,Long>> summaryDatas;
 
-    protected Map<String,String> uaWithIp;
+    Map<String,String> uaWithIp;
 
-    protected List<String> blackIp;
+    List<String> blackIp;
 
-    protected List<String> tool = Lists.newArrayList("scrapy","curl","httpclient","wget");
-
-    protected void setFile(String path){
+    void setFile(String path){
         File file = new File(path);
         try {
             Reader rd = new FileReader(file);
@@ -40,7 +38,7 @@ public abstract class Parser<T> {
         }
     }
 
-    protected void initOutputStream(String path){
+    void initOutputStream(String path){
         File file = new File(path);
         try {
             Writer wt = new FileWriter(file, false);
@@ -50,7 +48,17 @@ public abstract class Parser<T> {
         }
     }
 
-    public abstract void parserAll(String path);
+    public void parserAll(){
+        String str;
+        datas = Lists.newArrayList();
+        try {
+            while ((str = reader.readLine()) != null){
+                datas.add(parserLine(str));
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 
     public abstract T parserLine(String content);
 
@@ -58,10 +66,40 @@ public abstract class Parser<T> {
 
     public abstract void printAll();
 
-    public abstract void printOne(String path, String key);
+    public void printOne(String path, String key){
+        initOutputStream(path);
+        String line;
+        Map<String,Long> dataMap = (Map<String,Long>)summaryDatas.get(key);
+        List<Map.Entry<String,Long>> list = new ArrayList<Map.Entry<String,Long>>(dataMap.entrySet());
+        //然后通过比较器来实现排序
+        Collections.sort(list,new Comparator<Map.Entry<String,Long>>() {
+            //升序排序
+            public int compare(Map.Entry<String, Long> o1,
+                               Map.Entry<String, Long> o2) {
+                return -o1.getValue().compareTo(o2.getValue());
+            }
 
-    public abstract void printIpNotAllow(String path);
+        });
 
-    public abstract void printUa(String path);
+        try {
+            for(Map.Entry<String,Long> entry:list){
+                line = entry.getKey() + "=" + entry.getValue();
+                writer.write(line);
+                writer.newLine();
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }finally {
+            try {
+                writer.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    public void printIpNotAllow(String path){}
+
+    public void printUa(String path){}
 
 }
