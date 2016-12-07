@@ -49,15 +49,20 @@ public abstract class Parser<T> {
     }
 
     public void parserAll(){
+        System.out.println("start parser log");
         String str;
         datas = Lists.newArrayList();
         try {
             while ((str = reader.readLine()) != null){
-                datas.add(parserLine(str));
+                T data = parserLine(str);
+                if(data != null){
+                    datas.add(data);
+                }
             }
         } catch (IOException e) {
             e.printStackTrace();
         }
+        System.out.println("end parser log");
     }
 
     public abstract T parserLine(String content);
@@ -66,10 +71,10 @@ public abstract class Parser<T> {
 
     public abstract void printAll();
 
-    public void printOne(String path, String key){
+    void printOne(String path, String key){
         initOutputStream(path);
         String line;
-        Map<String,Long> dataMap = (Map<String,Long>)summaryDatas.get(key);
+        Map<String,Long> dataMap = summaryDatas.get(key);
         List<Map.Entry<String,Long>> list = new ArrayList<Map.Entry<String,Long>>(dataMap.entrySet());
         //然后通过比较器来实现排序
         Collections.sort(list,new Comparator<Map.Entry<String,Long>>() {
