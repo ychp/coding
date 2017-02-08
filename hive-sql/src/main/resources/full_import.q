@@ -15,5 +15,4 @@ Insert overwrite table ${database}.dwd_${table_name} partition(pt='${PT_DATE}')
 select
 	reflect("java.util.UUID", "randomUUID"),
 	${columns}
-from ${database}.s_${table_name}
-where t.num=1 ;
+from ${database}.s_${table_name};
