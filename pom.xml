@@ -17,6 +17,7 @@
         <module>log-parser</module>
         <module>spider</module>
         <module>image</module>
+        <module>hive-sql</module>
     </modules>
 
     <properties>

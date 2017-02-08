@@ -1,0 +1,30 @@
+database:terminus
+table_name:scrm_casarte_qyredemption
+left_join_columns:qre_id
+inc_column:qre_update_dt
+columns start
+| qre_id                   | double                |                       |
+| qre_qyr_id               | double                |                       |
+| qre_num                  | string                |                       |
+| qre_money                | double                |                       |
+| qre_credit               | double                |                       |
+| qre_buytotal             | double                |                       |
+| qre_buytime              | string                |                       |
+| qre_state                | double                |                       |
+| qre_ctc_id               | double                |                       |
+| qre_type                 | double                |                       |
+| qre_attrib_1             | double                |                       |
+| qre_attrib_2             | double                |                       |
+| qre_attrib_3             | string                |                       |
+| qre_attrib_4             | string                |                       |
+| qre_attrib_5             | string                |                       |
+| qre_attrib_6             | string                |                       |
+| qre_attrib_7             | double                |                       |
+| qre_attrib_8             | double                |                       |
+| qre_filename             | string                |                       |
+| qre_acquisition_dt       | string                |                       |
+| qre_creation_dt          | string                |                       |
+| qre_creationuid          | string                |                       |
+| qre_update_dt            | string                |                       |
+| qre_updateuid            | string                |                       |
+columns end
