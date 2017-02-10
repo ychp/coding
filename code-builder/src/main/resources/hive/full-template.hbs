@@ -1,0 +1,24 @@
+-- 创建表
+create table if not exists {{database}}.dwd_{{table_name}} (
+horus_id				string,
+{{#each columns}}{{name}}        {{dataType}}{{#unless @last}},{{/unless}}
+{{/each}})
+PARTITIONED BY (
+  pt string)
+STORED AS PARQUET
+TBLPROPERTIES (
+  'parquet.compression'='SNAPPY'
+);
+
+-- 全量插入
+Insert overwrite table {{database}}.dwd_{{table_name}} partition(pt='${PT_DATE}')
+select
+	reflect("java.util.UUID", "randomUUID"),
+    {{#each columns}}{{name}}{{#unless @last}},{{/unless}}
+    {{/each}}from (
+	select
+        {{#each columns}}{{name}},
+        {{/each}}row_number() over (partition by {{partition_column}} order by {{inc_column}} desc) num
+	from {{database}}.s_{{table_name}}
+) t
+where t.num=1;

@@ -1,7 +1,7 @@
 database:terminus
 file_name:d表scrm卡萨帝会员等级变化历史
 table_name:scrm_casarte_hcustomertype
-left_join_columns:hct_ctc_id,hct_ctt_id,hct_dt
+partition_column:hct_ctc_id,hct_ctt_id,hct_dt
 inc_column:hct_update_dt
 columns start
 | hct_ctc_id               | double                |                       |

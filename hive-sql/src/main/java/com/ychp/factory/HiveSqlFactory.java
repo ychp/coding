@@ -1,3 +1,5 @@
+package com.ychp.factory;
+
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.*;
@@ -21,10 +23,6 @@ public class HiveSqlFactory {
     private static final String COLUMN_SPLIT = "|";
 
     private static final String COLUMN_SPLIT_REGEX = "\\|";
-
-//    private static final String PARAM_PREF = "\\$\\{";
-
-//    private static final String PARAM_SUF = "\\}";
 
     private static final String COLUMN_SUF = ",";
 
@@ -51,14 +49,14 @@ public class HiveSqlFactory {
 
             Boolean isDefaultInc = true;
 
-            if(!StringUtils.isEmpty(argsMap.get("full_template"))){
+            if(!StringUtils.isEmpty(argsMap.get("fullTemplate"))){
                 isDefaultFull = false;
-                fullImportTemplatePath = argsMap.get("full_template");
+                fullImportTemplatePath = argsMap.get("fullTemplate");
             }
 
-            if(!StringUtils.isEmpty(argsMap.get("inc_template"))){
+            if(!StringUtils.isEmpty(argsMap.get("incTemplate"))){
                 isDefaultInc = false;
-                incImportTemplatePath = argsMap.get("inc_template");
+                incImportTemplatePath = argsMap.get("incTemplate");
             }
 
             String outPath = DEFAULT_OUT_PATH;
@@ -98,6 +96,11 @@ public class HiveSqlFactory {
         }
     }
 
+    /**
+     * 获取运行变量
+     * @param args main函数变量
+     * @return 变量map
+     */
     private static Map<String,String> getArgsMap(String[] args) {
         Map<String,String> argsMap = new HashMap<String, String>();
         for(int i=0; i < args.length; ) {
@@ -108,6 +111,7 @@ public class HiveSqlFactory {
         }
         return argsMap;
     }
+
 
     private static BufferedReader getTemplateStream(String templatePath, Boolean isDefault) throws FileNotFoundException {
         BufferedReader bufferedReader;
@@ -130,7 +134,7 @@ public class HiveSqlFactory {
     private static void factoryInc(Map<String, Object> paramMap, BufferedReader incImportTemplateReader, String outPath) {
         BufferedWriter bufferedWriter = null;
         try {
-            bufferedWriter = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(new File(outPath + File.separator + "inc_" + paramMap.get("table_name") +".q"))));
+            bufferedWriter = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(new File(outPath + File.separator + paramMap.get("file_name") +"增量.q"))));
             String line;
             Map<String,String> dataTypeByColumns = (Map<String,String>)paramMap.get("dataTypeByColumns");
             List<String> columns = new ArrayList<String>();
@@ -142,27 +146,28 @@ public class HiveSqlFactory {
             }
 
             while ((line = incImportTemplateReader.readLine()) != null) {
-                if(line.contains("${table_name}")){
-                    line = line.replace("${table_name}", (String)paramMap.get("table_name"));
-                }
-                if(line.contains("${database}")){
-                    line = line.replace("${database}", (String)paramMap.get("database"));
-                }
-                if(line.contains("${inc_column}")){
-                    line = line.replace("${inc_column}", (String)paramMap.get("inc_column"));
+
+                if(!line.contains("#{")){
+                    bufferedWriter.write(line);
+                    bufferedWriter.newLine();
+                    continue;
                 }
 
-                if(line.contains("${left_join_columns}")){
-                    line = line.replace("${left_join_columns}", (String)paramMap.get("left_join_columns"));
+                Boolean isWrite = factoryCommonParam(bufferedWriter, line, paramMap, columns, columnsWithDataType);
+
+                if(isWrite){
+                    continue;
                 }
 
-                if(line.contains("${table_columns}")){
+                if(line.contains("#{inc_column}")){
+                    line = line.replace("#{inc_column}", (String)paramMap.get("inc_column"));
+                }
+
+                if(line.contains("#{left_join_columns}")){
+                    String[] ljColumns = ((String)paramMap.get("left_join_columns")).split(",");
                     String tmpLine;
-                    for(String columnWithDataType : columnsWithDataType) {
-                        tmpLine = line.replace("${table_columns}", trimLeft(columnWithDataType));
-                        if(columnsWithDataType.indexOf(columnWithDataType) == columnsWithDataType.size() - 1){
-                            tmpLine = tmpLine.replace(COLUMN_SUF, "");
-                        }
+                    for(String ljColumn : ljColumns) {
+                        tmpLine = line.replace("#{left_join_columns}", trimLeft(ljColumn));
                         bufferedWriter.write(tmpLine);
                         bufferedWriter.newLine();
                     }
@@ -170,33 +175,28 @@ public class HiveSqlFactory {
                     continue;
                 }
 
-                if(line.contains("${columns}")){
+                if(line.contains("#{partition_columns}")){
+                    line = line.replace("#{partition_columns}", (String)paramMap.get("left_join_columns"));
+                }
+
+
+                if(line.contains("#{left_join_column_conditions}")){
+                    String[] ljColumns = ((String)paramMap.get("left_join_columns")).split(",");
                     String tmpLine;
-                    for(String column : columns) {
-                        tmpLine = line.replace("${columns}", column);
-                        if(columns.indexOf(column) == columns.size() - 1){
-                            tmpLine = tmpLine.replace(COLUMN_SUF, "");
+                    for(int i = 0; i< ljColumns.length; i++){
+                        tmpLine = line.replace("#{left_join_column_conditions}", ljColumns[i]);
+                        if(ljColumns.length > 1 && i < ljColumns.length - 1){
+                            tmpLine += "\tand";
                         }
                         bufferedWriter.write(tmpLine);
                         bufferedWriter.newLine();
                     }
-                    bufferedWriter.flush();
-                    continue;
-                }
-
-                if(line.contains("${columnsWithSuf}")){
-                    String tmpLine;
-                    for(String column : columns) {
-                        tmpLine = line.replace("${columnsWithSuf}", column);
-                        bufferedWriter.write(tmpLine);
-                        bufferedWriter.newLine();
-                    }
-                    bufferedWriter.flush();
                     continue;
                 }
 
                 bufferedWriter.write(line);
                 bufferedWriter.newLine();
+
             }
         } catch (IOException ie){
             ie.printStackTrace();
@@ -221,7 +221,7 @@ public class HiveSqlFactory {
     private static void factoryFull(Map<String, Object> paramMap, BufferedReader fullImportTemplateReader, String outPath) {
         BufferedWriter bufferedWriter = null;
         try {
-            bufferedWriter = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(new File(outPath + File.separator + "full_" + paramMap.get("table_name") +".q"))));
+            bufferedWriter = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(new File(outPath + File.separator + paramMap.get("file_name") +"全量.q"))));
             String line;
             Map<String,String> dataTypeByColumns = (Map<String,String>)paramMap.get("dataTypeByColumns");
             List<String> columns = new ArrayList<String>();
@@ -233,44 +233,30 @@ public class HiveSqlFactory {
             }
 
             while ((line = fullImportTemplateReader.readLine()) != null) {
-//                if(line.matches(PARAM_PREF + "[a-zA-Z]+[_a-zA-z]*" + PARAM_SUF)){
-                if(line.contains("${table_name}")){
-                    line = line.replace("${table_name}", (String)paramMap.get("table_name"));
-                }
-                if(line.contains("${database}")){
-                    line = line.replace("${database}", (String)paramMap.get("database"));
-                }
 
-                if(line.contains("${table_columns}")){
-                    String tmpLine;
-                    for(String columnWithDataType : columnsWithDataType) {
-                        tmpLine = line.replace("${table_columns}", trimLeft(columnWithDataType));
-                        if(columnsWithDataType.indexOf(columnWithDataType) == columnsWithDataType.size() - 1){
-                            tmpLine = tmpLine.replace(COLUMN_SUF, "");
-                        }
-                        bufferedWriter.write(tmpLine);
-                        bufferedWriter.newLine();
-                    }
-                    bufferedWriter.flush();
+                if(!line.contains("#{")){
+                    bufferedWriter.write(line);
+                    bufferedWriter.newLine();
                     continue;
                 }
 
-                if(line.contains("${columns}")){
-                    String tmpLine;
-                    for(String column : columns) {
-                        tmpLine = line.replace("${columns}", column);
-                        if(columns.indexOf(column) == columns.size() - 1){
-                            tmpLine = tmpLine.replace(COLUMN_SUF, "");
-                        }
-                        bufferedWriter.write(tmpLine);
-                        bufferedWriter.newLine();
-                    }
-                    bufferedWriter.flush();
+                Boolean isWrite = factoryCommonParam(bufferedWriter, line, paramMap, columns, columnsWithDataType);
+
+                if(isWrite){
                     continue;
+                }
+
+                if(line.contains("#{inc_column}")){
+                    line = line.replace("#{inc_column}", (String)paramMap.get("inc_column"));
+                }
+
+                if(line.contains("#{left_join_columns}")){
+                    line = line.replace("#{left_join_columns}", (String)paramMap.get("left_join_columns"));
                 }
 
                 bufferedWriter.write(line);
                 bufferedWriter.newLine();
+
             }
         } catch (IOException ie){
             ie.printStackTrace();
@@ -292,6 +278,70 @@ public class HiveSqlFactory {
         }
     }
 
+    private static boolean factoryCommonParam(BufferedWriter bufferedWriter, String line, Map<String, Object> paramMap, List<String> columns, List<String> columnsWithDataType) throws IOException {
+
+        Boolean isWrite = false;
+        if(line.contains("#{table_columns}")){
+            String tmpLine;
+            for(String columnWithDataType : columnsWithDataType) {
+                tmpLine = line.replace("#{table_columns}", trimLeft(columnWithDataType));
+                if(columnsWithDataType.indexOf(columnWithDataType) == columnsWithDataType.size() - 1){
+                    tmpLine = tmpLine.replace(COLUMN_SUF, "");
+                }
+                bufferedWriter.write(tmpLine);
+                bufferedWriter.newLine();
+            }
+            bufferedWriter.flush();
+            return true;
+        }
+
+        if(line.contains("#{columns}")){
+            String tmpLine;
+            for(String column : columns) {
+                tmpLine = line.replace("#{columns}", column);
+                if(columns.indexOf(column) == columns.size() - 1){
+                    tmpLine = tmpLine.replace(COLUMN_SUF, "");
+                }
+                bufferedWriter.write(tmpLine);
+                bufferedWriter.newLine();
+            }
+            bufferedWriter.flush();
+            return true;
+        }
+
+        if(line.contains("#{columnsWithSuf}")){
+            String tmpLine;
+            for(String column : columns) {
+                tmpLine = line.replace("#{columnsWithSuf}", column);
+                bufferedWriter.write(tmpLine);
+                bufferedWriter.newLine();
+            }
+            bufferedWriter.flush();
+            return true;
+        }
+
+        if(line.contains("#{table_name}")){
+            line = line.replace("#{table_name}", (String)paramMap.get("table_name"));
+            isWrite = true;
+        }
+        if(line.contains("#{database}")){
+            line = line.replace("#{database}", (String)paramMap.get("database"));
+            isWrite = true;
+        }
+
+        if(isWrite) {
+            bufferedWriter.write(line);
+            bufferedWriter.newLine();
+        }
+        return isWrite;
+    }
+
+    /**
+     * 获取参数文件流
+     * @param paramPath 参数文件路径
+     * @return 文件流
+     * @throws FileNotFoundException 文件不存在异常
+     */
     private static BufferedReader getParamReader(String paramPath) throws FileNotFoundException {
         BufferedReader bufferedReader;
 
@@ -306,6 +356,12 @@ public class HiveSqlFactory {
         return bufferedReader;
     }
 
+    /**
+     * 解析参数文件
+     * @param bufferedReader 参数文件流
+     * @return 参数map
+     * @throws IOException 文件异常
+     */
     private static Map<String,Object> getParams(BufferedReader bufferedReader) throws IOException {
         Map<String,Object> paramMap = new HashMap<String, Object>();
         String line;
