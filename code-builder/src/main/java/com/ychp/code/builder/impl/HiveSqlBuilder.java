@@ -2,7 +2,6 @@ package com.ychp.code.builder.impl;
 
 import com.github.jknack.handlebars.Handlebars;
 import com.github.jknack.handlebars.Template;
-import com.github.jknack.handlebars.io.TemplateSource;
 import com.google.common.collect.Lists;
 import com.ychp.code.builder.Builder;
 import com.ychp.code.builder.dto.ColumnDto;
@@ -11,7 +10,6 @@ import org.apache.commons.lang3.StringUtils;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -29,11 +27,12 @@ public class HiveSqlBuilder extends Builder {
 
     private static final String COLUMN_SPLIT_REGEX = "\\|";
 
-    protected void buildFile(String templatePath, Map<String, Object> paramMap) throws IOException {
+    protected String buildFile(String templatePath, Map<String, Object> paramMap) throws IOException {
         Handlebars handlebars = new Handlebars();
         Template template = handlebars.compile(templatePath);
         String result = template.apply(paramMap);
         System.out.println(result);
+        return result;
     }
 
     @Override
@@ -83,6 +82,15 @@ public class HiveSqlBuilder extends Builder {
 
     protected String getDefaultTemplate() {
         return "hive/full-template,hive/inc-template";
+    }
+
+    @Override
+    protected String[] getFileSuff(Object fileSuffStr){
+        if(fileSuffStr == null || StringUtils.isEmpty((String)fileSuffStr)){
+            return new String[]{"全量.q", "增量.q"};
+        } else {
+            return ((String) fileSuffStr).split(SPLIT_COM);
+        }
     }
 
     public static void main(String[] args){

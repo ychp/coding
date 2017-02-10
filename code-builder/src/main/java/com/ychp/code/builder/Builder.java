@@ -29,11 +29,24 @@ public abstract class Builder {
             String templatePath = paramMap.get(TEMPLATE_PATH_KEY) != null ? (String)paramMap.get(TEMPLATE_PATH_KEY) : null;
             paramMap.remove(TEMPLATE_PATH_KEY);
             String[] templates = getTemplatePath(templatePath);
-            for(String template : templates){
-                if(StringUtils.isEmpty(template)){
+            String[] fileSuff = getFileSuff(paramMap.get(FILE_SUFF_KEY));
+            if(fileSuff.length > templates.length){
+                throw new RuntimeException("file suff cannot more than template");
+            }
+            String content;
+            String outPath = paramMap.get(OUT_PATH_KEY) != null ? (String) paramMap.get(OUT_PATH_KEY) : getDefaultOutPath();
+            for(int i = 0; i < templates.length; i++){
+                if(StringUtils.isEmpty(templates[i])){
                     continue;
                 }
-                buildFile(template, paramMap);
+                content = buildFile(templates[i], paramMap);
+                if (fileSuff.length == templates.length){
+                    writeToLocal(outPath, fileSuff[i], content);
+                } else  if (fileSuff.length == 1){
+                    writeToLocal(outPath, fileSuff[1], content);
+                } else  if (fileSuff.length == 0){
+                    writeToLocal(outPath, null, content);
+                }
             }
 
         } catch (IOException e){
@@ -50,7 +63,41 @@ public abstract class Builder {
 
     }
 
-    protected abstract void buildFile(String templatePath, Map<String, Object> paramMap) throws IOException;
+    protected String getDefaultOutPath(){
+        String path = this.getClass().getProtectionDomain().getCodeSource().getLocation().getPath();
+        int lastIndex = path.lastIndexOf(File.separator) + 1;
+        return path.substring(0, lastIndex) + DEFAULT_OUT_FILE_NAME;
+    }
+
+    protected String[] getFileSuff(Object fileSuffStr){
+        if(fileSuffStr == null || StringUtils.isEmpty((String)fileSuffStr)){
+            return new String[0];
+        } else {
+            return ((String) fileSuffStr).split(SPLIT_COM);
+        }
+    }
+
+    protected void writeToLocal(String outPath, String fileSuf, String content){
+        BufferedWriter bufferedWriter = null;
+        try{
+            String fileName = outPath + (StringUtils.isEmpty(fileSuf) ? "" : fileSuf);
+            File file = new File(fileName);
+            bufferedWriter = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file)));
+            bufferedWriter.write(content);
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            if(bufferedWriter != null){
+                try {
+                    bufferedWriter.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+    }
+
+    protected abstract String buildFile(String templatePath, Map<String, Object> paramMap) throws IOException;
 
     private String[] getTemplatePath(String templatePath) throws FileNotFoundException {
         if(templatePath == null){
@@ -106,10 +153,17 @@ public abstract class Builder {
         Map<String,Object> paramMap = Maps.newHashMap();
         String line;
         String[] paramKV;
+        String key;
+        String value;
         while ((line = bufferedReader.readLine()) != null){
             if(!StringUtils.isEmpty(line.trim()) && line.contains(PARAM_SPLIT_REGEX)){
                 paramKV = line.split(PARAM_SPLIT_REGEX);
-                paramMap.put(paramKV[0], paramKV[1]);
+                key = paramKV[0];
+                value = paramKV[1];
+                paramMap.put(key, value);
+                if(value.contains(SPLIT_COM)){
+                    paramMap.put(key + "s", value.split(SPLIT_COM));
+                }
             }
         }
 
