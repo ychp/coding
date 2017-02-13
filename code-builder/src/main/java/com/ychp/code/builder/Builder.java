@@ -30,7 +30,7 @@ public abstract class Builder {
                 throw new RuntimeException("file suff cannot more than template");
             }
             String content;
-            String outPath = paramMap.get(OUT_PATH_KEY) != null ? (String) paramMap.get(OUT_PATH_KEY) : getDefaultOutPath(fileName);
+            String outPath = paramMap.get(OUT_PATH_KEY) != null ? (String) paramMap.get(OUT_PATH_KEY) : getDefaultOutPath(paramMap);
             Map<String, Object> templateParamMap = generalTemplateParamMap(paramMap);
             for(int i = 0; i < templates.length; i++){
                 if(StringUtils.isEmpty(templates[i])){
@@ -68,10 +68,10 @@ public abstract class Builder {
         return  paramMap;
     }
 
-    protected String getDefaultOutPath(String fileName){
+    protected String getDefaultOutPath(Map<String, Object> paramMap){
         String path = this.getClass().getProtectionDomain().getCodeSource().getLocation().getPath();
         int lastIndex = path.lastIndexOf(File.separator) + 1;
-        return path.substring(0, lastIndex) + (StringUtils.isEmpty(fileName) ? DEFAULT_OUT_FILE_NAME : fileName);
+        return path.substring(0, lastIndex) + (StringUtils.isEmpty((String)paramMap.get(FILE_NAME_KEY)) ? DEFAULT_OUT_FILE_NAME : (String)paramMap.get(FILE_NAME_KEY));
     }
 
     protected String[] getFileSuff(Object fileSuffStr){

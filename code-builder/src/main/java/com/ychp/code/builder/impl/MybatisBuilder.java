@@ -14,6 +14,7 @@ import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.IOException;
 import java.sql.*;
 import java.util.Date;
@@ -21,8 +22,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static com.ychp.code.builder.utils.BuilderUtils.PARAM_SPLIT_REGEX;
-import static com.ychp.code.builder.utils.BuilderUtils.SPLIT_COM;
+import static com.ychp.code.builder.utils.BuilderUtils.*;
 
 /**
  * Desc:
@@ -158,6 +158,12 @@ public class MybatisBuilder extends Builder {
         } else {
             return ((String) fileSuffStr).split(SPLIT_COM);
         }
+    }
+
+    @Override
+    protected String getDefaultOutPath(Map<String, Object> paramMap) {
+        paramMap.put(FILE_NAME_KEY, paramMap.get("modelName"));
+        return super.getDefaultOutPath(paramMap);
     }
 
     public static void main(String[] args){
