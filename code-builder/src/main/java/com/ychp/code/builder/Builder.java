@@ -16,10 +16,6 @@ import static com.ychp.code.builder.utils.BuilderUtils.*;
 public abstract class Builder {
 
     public void build(String ... args){
-        if(args.length == 0){
-            throw new RuntimeException("run args not empty");
-        }
-
         Map<String, String> argsMap = getArgsMap(args);
 
         BufferedReader paramReader = null;
@@ -27,19 +23,20 @@ public abstract class Builder {
             paramReader = getParamReader(argsMap.get(PARAM_PATH_KEY));
             Map<String, Object> paramMap = getParams(paramReader);
             String templatePath = paramMap.get(TEMPLATE_PATH_KEY) != null ? (String)paramMap.get(TEMPLATE_PATH_KEY) : null;
-            paramMap.remove(TEMPLATE_PATH_KEY);
             String[] templates = getTemplatePath(templatePath);
             String[] fileSuff = getFileSuff(paramMap.get(FILE_SUFF_KEY));
+            String fileName = paramMap.get(FILE_NAME_KEY) != null ? (String)paramMap.get(FILE_NAME_KEY) : null;
             if(fileSuff.length > templates.length){
                 throw new RuntimeException("file suff cannot more than template");
             }
             String content;
-            String outPath = paramMap.get(OUT_PATH_KEY) != null ? (String) paramMap.get(OUT_PATH_KEY) : getDefaultOutPath();
+            String outPath = paramMap.get(OUT_PATH_KEY) != null ? (String) paramMap.get(OUT_PATH_KEY) : getDefaultOutPath(fileName);
+            Map<String, Object> templateParamMap = generalTemplateParamMap(paramMap);
             for(int i = 0; i < templates.length; i++){
                 if(StringUtils.isEmpty(templates[i])){
                     continue;
                 }
-                content = buildFile(templates[i], paramMap);
+                content = buildFile(templates[i], templateParamMap);
                 if (fileSuff.length == templates.length){
                     writeToLocal(outPath, fileSuff[i], content);
                 } else  if (fileSuff.length == 1){
@@ -63,10 +60,18 @@ public abstract class Builder {
 
     }
 
-    protected String getDefaultOutPath(){
+    protected Map<String,Object> generalTemplateParamMap(Map<String, Object> paramMap) {
+        paramMap.remove(TEMPLATE_PATH_KEY);
+        paramMap.remove(FILE_SUFF_KEY);
+        paramMap.remove(OUT_PATH_KEY);
+        paramMap.remove(FILE_NAME_KEY);
+        return  paramMap;
+    }
+
+    protected String getDefaultOutPath(String fileName){
         String path = this.getClass().getProtectionDomain().getCodeSource().getLocation().getPath();
         int lastIndex = path.lastIndexOf(File.separator) + 1;
-        return path.substring(0, lastIndex) + DEFAULT_OUT_FILE_NAME;
+        return path.substring(0, lastIndex) + (StringUtils.isEmpty(fileName) ? DEFAULT_OUT_FILE_NAME : fileName);
     }
 
     protected String[] getFileSuff(Object fileSuffStr){
@@ -132,16 +137,23 @@ public abstract class Builder {
     private BufferedReader getParamReader(String paramPath) throws FileNotFoundException {
         BufferedReader bufferedReader;
 
-        File paramFile = new File(paramPath);
-
-        if(!paramFile.exists()){
-            throw new RuntimeException("param file not exist!");
+        if(StringUtils.isEmpty(paramPath)){
+            InputStream in = ClassLoader.getSystemResourceAsStream(getDefaultParamPath());
+            bufferedReader = new BufferedReader(new InputStreamReader(in));
+        } else {
+            File paramFile = new File(paramPath);
+            if(!paramFile.exists()){
+                InputStream in = ClassLoader.getSystemResourceAsStream(getDefaultParamPath());
+                bufferedReader = new BufferedReader(new InputStreamReader(in));
+            } else {
+                bufferedReader = new BufferedReader(new InputStreamReader(new FileInputStream(paramFile)));
+            }
         }
-
-        bufferedReader = new BufferedReader(new InputStreamReader(new FileInputStream(paramFile)));
 
         return bufferedReader;
     }
+
+    protected abstract String getDefaultParamPath();
 
     /**
      * 解析参数文件

@@ -12,11 +12,11 @@ import java.io.Serializable;
  */
 @Data
 @NoArgsConstructor
-public class ColumnDto implements Serializable {
+public class HiveColumnDto implements Serializable {
 
     private static final long serialVersionUID = -1787701137518696872L;
 
-    public ColumnDto(String name, String dataType) {
+    public HiveColumnDto(String name, String dataType) {
         this.name = name;
         this.dataType = dataType;
     }

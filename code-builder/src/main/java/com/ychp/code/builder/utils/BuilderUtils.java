@@ -15,6 +15,8 @@ public class BuilderUtils {
 
     public static final String FILE_SUFF_KEY = "fileSuff";
 
+    public static final String FILE_NAME_KEY = "file_name";
+
     public static final String DEFAULT_OUT_FILE_NAME = "default-build-file";
 
     public static final String SPLIT_COM = ",";

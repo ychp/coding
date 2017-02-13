@@ -4,7 +4,7 @@ import com.github.jknack.handlebars.Handlebars;
 import com.github.jknack.handlebars.Template;
 import com.google.common.collect.Lists;
 import com.ychp.code.builder.Builder;
-import com.ychp.code.builder.dto.ColumnDto;
+import com.ychp.code.builder.dto.HiveColumnDto;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.BufferedReader;
@@ -30,9 +30,11 @@ public class HiveSqlBuilder extends Builder {
     protected String buildFile(String templatePath, Map<String, Object> paramMap) throws IOException {
         Handlebars handlebars = new Handlebars();
         Template template = handlebars.compile(templatePath);
-        String result = template.apply(paramMap);
-        System.out.println(result);
-        return result;
+        return template.apply(paramMap);
+    }
+
+    protected String getDefaultParamPath() {
+        return "hive/param";
     }
 
     @Override
@@ -42,8 +44,8 @@ public class HiveSqlBuilder extends Builder {
         Boolean isColumns = false;
         String[] paramKV;
         String[] columnArr;
-        List<ColumnDto> columns = Lists.newArrayList();
-        ColumnDto columnDto;
+        List<HiveColumnDto> columns = Lists.newArrayList();
+        HiveColumnDto hiveColumnDto;
         String key;
         String value;
         while ((line = bufferedReader.readLine()) != null){
@@ -71,8 +73,8 @@ public class HiveSqlBuilder extends Builder {
                     continue;
                 }
                 columnArr = line.trim().split(COLUMN_SPLIT_REGEX);
-                columnDto = new ColumnDto(columnArr[1].trim(), columnArr[2].trim());
-                columns.add(columnDto);
+                hiveColumnDto = new HiveColumnDto(columnArr[1].trim(), columnArr[2].trim());
+                columns.add(hiveColumnDto);
             }
 
         }
