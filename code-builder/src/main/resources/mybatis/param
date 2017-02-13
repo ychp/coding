@@ -1,0 +1,10 @@
+databaseType=mysql
+host:localhost
+port:3306
+database:club
+username:root
+password:anywhere
+tableName:auth_roles
+modelName:Role
+modelPackage:com.ychp.model
+package:com.ychp.model.mysql

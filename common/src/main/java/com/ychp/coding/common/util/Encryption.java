@@ -25,38 +25,30 @@ public class Encryption {
      * 3des解密
      * @param value 待加密字符串
      * @param key 原始密钥字符串
-     * @return
-     * @throws Exception
      */
     public static String Decrypt3DES(String value, String key) throws EncryptionException {
         byte[] b = decryptMode(GetKeyBytes(key), Base64.decode(value));
-        return new String(b);
+        return new String(b != null ? b : new byte[0]);
     }
 
     /**
      * 3des加密
      * @param value 待加密字符串
      * @param key 原始密钥字符串
-     * @return
-     * @throws Exception
      */
     public static String Encrypt3DES(String value, String key) throws EncryptionException {
-        String str = byte2Base64(encryptMode(GetKeyBytes(key), md5Encode(value, key).getBytes()));
-        return str;
+        return byte2Base64(encryptMode(GetKeyBytes(key), md5Encode(value, key).getBytes()));
     }
 
     /**
      * 计算24位长的密码byte值,首先对原始密钥做MD5算hash值，再用前8位数据对应补全后8位
-     * @param strKey
-     * @return
-     * @throws Exception
      */
     public static byte[] GetKeyBytes(String strKey) throws EncryptionException {
         if (null == strKey || strKey.length() < 1) {
             throw new EncryptionException("encryption.key.not.empty");
         }
 
-        MessageDigest alg = null;
+        MessageDigest alg;
         try {
             alg = MessageDigest.getInstance("MD5");
         } catch (NoSuchAlgorithmException e) {
@@ -68,13 +60,9 @@ public class Encryption {
         int start = bkey.length;
         byte[] bkey24 = new byte[KEY_LENGTH];
 
-        for (int i = 0; i < start; i++) {
-            bkey24[i] = bkey[i];
-        }
+        System.arraycopy(bkey, 0, bkey24, 0, start);
 
-        for (int i = start; i < KEY_LENGTH; i++) {//为了与.net16位key兼容
-            bkey24[i] = bkey[i - start];
-        }
+        System.arraycopy(bkey, 0, bkey24, start, KEY_LENGTH - start);
 
         return bkey24;
     }
@@ -83,7 +71,6 @@ public class Encryption {
      *
      * @param keybyte 加密密钥，长度为24字节
      * @param src 为被加密的数据缓冲区（源）
-     * @return
      */
     public static byte[] encryptMode(byte[] keybyte, byte[] src) {
 
@@ -109,7 +96,6 @@ public class Encryption {
      *
      * @param keybyte 加密密钥，长度为24字节
      * @param src 为被加密的数据缓冲区（源）
-     * @return
      */
     public static byte[] decryptMode(byte[] keybyte, byte[] src) {
 
@@ -133,8 +119,6 @@ public class Encryption {
 
     /**
      * 转换成base64编码
-     * @param b
-     * @return
      */
     public static String byte2Base64(byte[] b) {
         return Base64.encode(b);
@@ -152,9 +136,9 @@ public class Encryption {
             md5 = MessageDigest.getInstance("MD5");
             byte[] byteArray = password.getBytes("UTF-8");
             byte[] md5Bytes = md5.digest(byteArray);
-            StringBuffer hexValue = new StringBuffer();
-            for (int i = 0; i < md5Bytes.length; i++) {
-                int val = ((int) md5Bytes[i]) & 0xff;
+            StringBuilder hexValue = new StringBuilder();
+            for (byte md5Byte : md5Bytes) {
+                int val = ((int) md5Byte) & 0xff;
                 if (val < 16) {
                     hexValue.append("0");
                 }
@@ -169,10 +153,6 @@ public class Encryption {
 
     /**
      * 验证密码
-     * @param value
-     * @param key
-     * @param equStr
-     * @return
      */
     public boolean checkPassword(String value, String key, String equStr){
         String inStr = md5Encode(value, key);
@@ -184,7 +164,7 @@ public class Encryption {
         int length = KEY_LENGTH;
         String base = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
         Random random = new Random();
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         for (int i = 0; i < length; i++) {
             int number = random.nextInt(base.length());
             sb.append(base.charAt(number));
@@ -203,9 +183,9 @@ public class Encryption {
             md5 = MessageDigest.getInstance("MD5");
             byte[] byteArray = inStr.getBytes("UTF-8");
             byte[] md5Bytes = md5.digest(byteArray);
-            StringBuffer hexValue = new StringBuffer();
-            for (int i = 0; i < md5Bytes.length; i++) {
-                int val = ((int) md5Bytes[i]) & 0xff;
+            StringBuilder hexValue = new StringBuilder();
+            for (byte md5Byte : md5Bytes) {
+                int val = ((int) md5Byte) & 0xff;
                 if (val < 16) {
                     hexValue.append("0");
                 }
@@ -220,19 +200,14 @@ public class Encryption {
 
 
     public static void main(String[] args) throws Exception {
-        String salt = getSalt();
+        String salt = "grqx5iCM2Ma8KT9x1hja6acW";
         System.out.println("key:" + salt);
-        String password = "123456";
+        String password = "IgfaPc3ZFfgMFBIvzg5g";
         password = Encrypt3DES(password, salt);
         System.out.println("password:" + password);
         password = Decrypt3DES(password, salt);
         System.out.println("origin_password:" + password);
 
-        String password1 = "123456";
-        password1 = Encrypt3DES(password1, salt);
-        System.out.println("password1:" + password1);
-        password1 = Decrypt3DES(password1, salt);
-        System.out.println("origin_password:" + password1);
 
     }
 

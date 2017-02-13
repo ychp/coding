@@ -7,8 +7,11 @@ import com.ychp.log.model.UserAgent;
 import com.ychp.log.utils.UaUtil;
 import lombok.extern.slf4j.Slf4j;
 
+import java.io.BufferedWriter;
 import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Desc:
@@ -19,20 +22,6 @@ import java.util.*;
 public class NginxLogParser extends Parser<Nginx> {
 
     private static final String DOMAIN = "www.yingchengpeng.com";
-
-    @Override
-    public void parserAll(String path) {
-        setFile(path);
-        String str = null;
-        datas = Lists.newArrayList();
-        try {
-            while ((str = reader.readLine()) != null){
-                datas.add(parserLine(str));
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
 
     @Override
     public Nginx parserLine(String content) {
@@ -51,7 +40,7 @@ public class NginxLogParser extends Parser<Nginx> {
         nginx.setContentLength(Integer.valueOf(strArr[2].split(" ")[2]));
 
         nginx.setUrl(strArr[3]);
-        if(nginx.getUrl().indexOf("/")!=-1) {
+        if(nginx.getUrl().contains("/")) {
             String domain = nginx.getUrl().split("/")[2];
             nginx.setDomain(domain);
         }
@@ -73,10 +62,10 @@ public class NginxLogParser extends Parser<Nginx> {
         Map<String, Long> ipAndUrlCount = Maps.newTreeMap();
         Map<String, Long> ipAndDomainCount = Maps.newTreeMap();
         for(Nginx nginx : datas){
-            ipCount.put(nginx.getIp(), ipCount.getOrDefault(nginx.getIp(),0L)+1);
-            urlCount.put(nginx.getUrl(), urlCount.getOrDefault(nginx.getUrl(),0L)+1);
-            ipAndUrlCount.put(nginx.getIp()+","+nginx.getUrl(), ipAndUrlCount.getOrDefault(nginx.getIp()+","+nginx.getUrl(),0L)+1);
-            ipAndDomainCount.put(nginx.getIp()+","+nginx.getDomain(), ipAndDomainCount.getOrDefault(nginx.getIp()+","+nginx.getDomain(),0L)+1);
+            ipCount.put(nginx.getIp(), ipCount.get(nginx.getIp()) == null ? 1 : ipCount.get(nginx.getIp()) + 1);
+            urlCount.put(nginx.getUrl(), urlCount.get(nginx.getUrl()) == null ? 1 : urlCount.get(nginx.getUrl()) + 1);
+            ipAndUrlCount.put(nginx.getIp()+","+nginx.getUrl(), ipAndUrlCount.get(nginx.getIp()+","+nginx.getUrl()) == null ? 1 : ipAndUrlCount.get(nginx.getIp()+","+nginx.getUrl()) + 1);
+            ipAndDomainCount.put(nginx.getIp()+","+nginx.getDomain(), ipAndDomainCount.get(nginx.getIp()+","+nginx.getDomain()) == null ? 1 : ipAndDomainCount.get(nginx.getIp()+","+nginx.getDomain()) + 1);
             uaWithIp.put(nginx.getIp(), nginx.getUa());
         }
         summaryDatas.put("ip", ipCount);
@@ -99,55 +88,17 @@ public class NginxLogParser extends Parser<Nginx> {
     }
 
     @Override
-    public void printOne(String path, String key) {
-        initOutputStream(path);
-        String line;
-        Map<String,Long> ipAndUrl = (Map<String,Long>)summaryDatas.get(key);
-        List<Map.Entry<String,Long>> list = new ArrayList<Map.Entry<String,Long>>(ipAndUrl.entrySet());
-        //然后通过比较器来实现排序
-        Collections.sort(list,new Comparator<Map.Entry<String,Long>>() {
-            //升序排序
-            public int compare(Map.Entry<String, Long> o1,
-                               Map.Entry<String, Long> o2) {
-                return -o1.getValue().compareTo(o2.getValue());
-            }
-
-        });
-
-        try {
-            for(Map.Entry<String,Long> entry:list){
-                line = entry.getKey() + "=" + entry.getValue();
-                writer.write(line);
-                writer.newLine();
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }finally {
-            try {
-                writer.close();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-    }
-
-    @Override
     public void printIpNotAllow(String path) {
         blackIp = Lists.newArrayList();
         initOutputStream(path);
         String line;
-        Map<String,Long> ipAndUrl = (Map<String,Long>)summaryDatas.get("ipAndDomain");
+        Map<String,Long> ipAndUrl = summaryDatas.get("ipAndDomain");
         List<Map.Entry<String,Long>> list = new ArrayList<Map.Entry<String,Long>>(ipAndUrl.entrySet());
         //然后通过比较器来实现排序
-        Collections.sort(list,new Comparator<Map.Entry<String,Long>>() {
-            //升序排序
-            public int compare(Map.Entry<String, Long> o1,
-                               Map.Entry<String, Long> o2) {
-                return -o1.getValue().compareTo(o2.getValue());
-            }
+        //升序排序
+        list.sort((o1, o2) -> -o1.getValue().compareTo(o2.getValue()));
 
-        });
-
+        BufferedWriter writer = getWriter();
         try {
             for(Map.Entry<String,Long> entry:list){
                 String ipAndDomain = entry.getKey();
@@ -175,12 +126,14 @@ public class NginxLogParser extends Parser<Nginx> {
     public void printUa(String path) {
         initOutputStream(path);
         String line;
+        BufferedWriter writer = getWriter();
         try {
+
             for(Map.Entry<String,String> entry:uaWithIp.entrySet()){
-                boolean isTool = entry.getValue().toLowerCase().indexOf("curl") !=-1
-                        || entry.getValue().toLowerCase().indexOf("scrapy") !=-1
-                        || entry.getValue().toLowerCase().indexOf("httpclient") !=-1
-                        || entry.getValue().toLowerCase().indexOf("wget") !=-1;
+                boolean isTool = entry.getValue().toLowerCase().contains("curl")
+                        || entry.getValue().toLowerCase().contains("scrapy")
+                        || entry.getValue().toLowerCase().contains("httpclient")
+                        || entry.getValue().toLowerCase().contains("wget");
                 if(blackIp.contains(entry.getKey()) && !"_".equals(entry.getValue()) && !isTool) {
                     line = entry.getValue() + "|";
                     writer.write(line);
@@ -198,9 +151,10 @@ public class NginxLogParser extends Parser<Nginx> {
     }
 
 
-    public static final void main(String[] args){
+    public static void main(String[] args){
         NginxLogParser parser = new NginxLogParser();
-        parser.parserAll("/Users/yingchengpeng/404.txt");
+        parser.setFile("/Users/yingchengpeng/404.txt");
+        parser.parserAll();
         parser.summary();
         parser.printAll();
     }

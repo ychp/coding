@@ -1,13 +1,12 @@
 package com.ychp.spider.utils;
+import org.apache.commons.lang3.StringUtils;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.PrintWriter;
+import javax.net.ssl.*;
+import java.io.*;
 import java.net.URL;
 import java.net.URLConnection;
-import java.util.List;
-import java.util.Map;
+import java.security.cert.CertificateException;
+import java.security.cert.X509Certificate;
 
 /**
  * Desc:
@@ -39,7 +38,7 @@ public class HttpRequest {
             // 建立实际的连接
             connection.connect();
             // 获取所有响应头字段
-            Map<String, List<String>> map = connection.getHeaderFields();
+//            Map<String, List<String>> map = connection.getHeaderFields();
             // 遍历所有的响应头字段
 //            for (String key : map.keySet()) {
 //                System.out.println(key + "--->" + map.get(key));
@@ -125,5 +124,48 @@ public class HttpRequest {
             }
         }
         return result;
+    }
+
+    public static String getBySSL(String urlStr, String params) {
+        String sCurrentLine;
+        String sTotalString;
+        sTotalString = "";
+        if(!StringUtils.isEmpty(params)){
+            urlStr += params;
+        }
+        URL url ;
+        try {
+            url = new URL(urlStr);
+            HttpsURLConnection con = (HttpsURLConnection) url.openConnection();
+            X509TrustManager xtm = new X509TrustManager() {
+                public X509Certificate[] getAcceptedIssuers() {
+                    return null;
+                }
+                public void checkServerTrusted(X509Certificate[] arg0, String arg1)
+                        throws CertificateException {
+                }
+                public void checkClientTrusted(X509Certificate[] arg0, String arg1)
+                        throws CertificateException {
+                }
+            };
+
+            TrustManager[] tm = { xtm };
+
+            SSLContext ctx = SSLContext.getInstance("TLS");
+            ctx.init(null, tm, null);
+
+            con.setSSLSocketFactory(ctx.getSocketFactory());
+            con.setHostnameVerifier((arg0, arg1) -> true);
+            InputStream l_urlStream = con.getInputStream();
+            BufferedReader l_reader = new BufferedReader(new InputStreamReader(
+                    l_urlStream));
+            while ((sCurrentLine = l_reader.readLine()) != null) {
+                sTotalString += sCurrentLine + "\r\n";
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return sTotalString.trim();
     }
 }

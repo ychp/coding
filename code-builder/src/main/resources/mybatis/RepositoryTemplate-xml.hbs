@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="{{package}}.{{modelName}}Repository">
+    <resultMap id="listMap" type="{{modelPackage}}.{{modelName}}" >
+    </resultMap>
+    <parameterMap id="paramMap" type="{{modelPackage}}.{{modelName}}"></parameterMap>
+
+    <sql id="tb">`{{tableName}}`</sql>
+
+    <sql id="allColumns">`{{primaryColumn.sqlColumn}}`,<include refid="columns"/></sql>
+
+    <sql id="columns">
+        {{#each columns}}`{{sqlColumn}}`{{#unless @last}},{{/unless}}{{/each}}
+    </sql>
+
+    <sql id="values">
+        {{#each columns}}#{{javaXmlColumn}}{{#unless @last}},{{/unless}}{{/each}}
+    </sql>
+
+    <insert id="create" parameterMap="paramMap" keyProperty="id" useGeneratedKeys="true">
+        INSERT INTO <include refid="tb"/>
+        (<include refid="columns"/>)VALUES (<include refid="values"/>,now(),now())
+    </insert>
+
+    <insert id="creates" parameterMap="paramMap" useGeneratedKeys="true">
+        INSERT INTO <include refid="tb"/>
+        (<include refid="columns"/>) VALUES
+        <foreach collection="list" item="user" separator=",">
+            (<include refid="values"/>,now(),now())
+        </foreach>
+    </insert>
+
+    <update id="update" parameterMap="paramMap" >
+        UPDATE <include refid="tb"/>
+        SET
+        {{#each columns}}<if test="{{javaColumn}} !=null">`{{sqlColumn}}`=#{{javaXmlColumn}},</if>
+        {{/each}}`updated_at`= now()
+        WHERE `{{primaryColumn.sqlColumn}}` = #{{primaryColumn.javaXmlColumn}}
+    </update>
+
+    <sql id="criteria">
+        WHERE 1=1
+        <if test="{{primaryColumn.javaColumn}} != null">AND `{{primaryColumn.sqlColumn}}` = #{{primaryColumn.javaXmlColumn}}</if>
+        {{#each columns}}<if test="{{javaColumn}} !=null">AND `{{sqlColumn}}`=#{{javaXmlColumn}}</if>
+        {{/each}}
+    </sql>
+
+    <select id="findById" parameterType="long" resultMap="listMap">
+        SELECT * FROM <include refid="tb"/> WHERE `{{primaryColumn.sqlColumn}}` = #{{primaryColumn.javaXmlColumn}}
+    </select>
+
+    <delete id="delete" >
+        DELETE FROM <include refid="tb"/> WHERE `{{primaryColumn.sqlColumn}}` = #{{primaryColumn.javaXmlColumn}}
+    </delete>
+
+    <select id="findListBy" parameterType="map" resultMap="listMap">
+        SELECT * FROM <include refid="tb"/>
+        <include refid="criteria"/>
+    </select>
+
+    <select id="countBy" parameterType="map" resultType="long">
+        SELECT count(*) FROM <include refid="tb"/>
+        <include refid="criteria"/>
+    </select>
+
+    <select id="pagingBy" parameterType="map" resultMap="listMap">
+        SELECT * FROM <include refid="tb"/>
+        <include refid="criteria"/>
+        ORDER BY `{{primaryColumn.sqlColumn}}` DESC
+        LIMIT #{offset},#{limit}
+    </select>
+
+</mapper>

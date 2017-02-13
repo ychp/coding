@@ -1,5 +1,8 @@
 package com.ychp.coding.common.exception;
 
+import lombok.Getter;
+import lombok.Setter;
+
 /**
  * Desc:
  * Author: <a href="ychp@terminus.io">应程鹏</a>
@@ -7,7 +10,9 @@ package com.ychp.coding.common.exception;
  */
 public class JsonResponseException extends RuntimeException {
 
+    @Setter@Getter
     private int status = 500;
+    @Setter@Getter
     private String message = "unknow error";
 
     public JsonResponseException(){}
@@ -21,19 +26,4 @@ public class JsonResponseException extends RuntimeException {
         this.message = message;
     }
 
-    public int getStatus() {
-        return this.status;
-    }
-
-    public void setStatus(int status) {
-        this.status = status;
-    }
-
-    public String getMessage() {
-        return this.message;
-    }
-
-    public void setMessage(String message) {
-        this.message = message;
-    }
 }

@@ -23,26 +23,19 @@ public class YchpBanner implements org.springframework.boot.Banner {
     private static final String SPRING_BOOT = " :: Powered by Ychp.inc :: ";
     private static final int STRAP_LINE_SIZE = 42;
 
-    public YchpBanner() {
-    }
-
     public void printBanner(Environment environment, Class<?> sourceClass, PrintStream printStream) {
-        String[] version = BANNER;
-        int padding = version.length;
-
-        for(int var6 = 0; var6 < padding; ++var6) {
-            String line = version[var6];
+        for (String line : BANNER) {
             printStream.println(line);
         }
 
-        String var8 = "(v1.0)";
+        String versionStr = "(v1.0)";
 
-        String var9;
-        for(var9 = ""; var9.length() < 42 - (var8.length() + " :: Powered by Ychp.inc :: ".length()); var9 = var9 + " ") {
-            ;
+        String empty = "";
+        for(; empty.length() < STRAP_LINE_SIZE - (versionStr.length() + SPRING_BOOT.length());) {
+            empty = empty + " ";
         }
 
-        printStream.println(AnsiOutput.toString(new Object[]{AnsiColor.GREEN, " :: Powered by Ychp.inc :: ", AnsiColor.DEFAULT, var9, AnsiStyle.FAINT, var8}));
+        printStream.println(AnsiOutput.toString(new Object[]{AnsiColor.GREEN, SPRING_BOOT, AnsiColor.DEFAULT, empty, AnsiStyle.FAINT, versionStr}));
         printStream.println();
     }
 }

@@ -29,7 +29,7 @@ public class JedisTemplate {
         boolean broken = false;
         try{
             jedis = jedisPool.getResource();
-            jedis.select(indb);
+//            jedis.select(indb);
             return action.action(jedis);
         }catch (JedisConnectionException je){
             broken = true;

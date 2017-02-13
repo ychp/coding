@@ -44,22 +44,17 @@ public class FreeMarkerConfiguration{
     @Autowired
     private FreemarkerProperties properties;
 
-    public FreeMarkerConfiguration() {
-    }
-
     @PostConstruct
     public void checkTemplateLocationExists() {
         if(this.properties.isCheckTemplateLocation()) {
             TemplateLocation templatePathLocation = null;
-            ArrayList locations = new ArrayList();
-            String[] var3 = this.properties.getTemplateLoaderPath();
-            int var4 = var3.length;
+            ArrayList<TemplateLocation> locations = new ArrayList<TemplateLocation>();
+            String[] pathArr = this.properties.getTemplateLoaderPath();
 
-            for(int var5 = 0; var5 < var4; ++var5) {
-                String templateLoaderPath = var3[var5];
+            for (String templateLoaderPath : pathArr) {
                 TemplateLocation location = new TemplateLocation(templateLoaderPath);
                 locations.add(location);
-                if(location.exists(this.applicationContext)) {
+                if (location.exists(this.applicationContext)) {
                     templatePathLocation = location;
                     break;
                 }
@@ -76,8 +71,6 @@ public class FreeMarkerConfiguration{
     @ConditionalOnClass({Servlet.class})
     @ConditionalOnWebApplication
     public static class FreeMarkerWebConfiguration extends FreeMarkerConfiguration.FreemarkerConfiguration {
-        public FreeMarkerWebConfiguration() {
-        }
 
         @Bean
         @ConditionalOnMissingBean({FreeMarkerConfig.class})
@@ -110,8 +103,6 @@ public class FreeMarkerConfiguration{
     @Configuration
     @ConditionalOnNotWebApplication
     public static class FreeMarkerNonWebConfiguration extends FreeMarkerConfiguration.FreemarkerConfiguration {
-        public FreeMarkerNonWebConfiguration() {
-        }
 
         @Bean
         @ConditionalOnMissingBean

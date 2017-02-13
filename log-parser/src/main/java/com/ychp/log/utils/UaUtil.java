@@ -22,13 +22,13 @@ public class UaUtil {
             e.printStackTrace();
         }
         UserAgent userAgent = new UserAgent();
-        userAgent.setSystem(userAgentInfo.getOsFamily());
-        userAgent.setSystemName(userAgentInfo.getOsName());
-        userAgent.setBrowserName(userAgentInfo.getUaFamily());
-        userAgent.setBrowserVersion(userAgentInfo.getBrowserVersionInfo());
-        userAgent.setDevice(userAgentInfo.getDeviceType());
-        userAgent.setBrowser(userAgentInfo.getUaName());
-        userAgent.setType(userAgentInfo.getType());
+        userAgent.setSystem(userAgentInfo != null ? userAgentInfo.getOsFamily() : null);
+        userAgent.setSystemName(userAgentInfo != null ? userAgentInfo.getOsName() : null);
+        userAgent.setBrowserName(userAgentInfo != null ? userAgentInfo.getUaFamily() : null);
+        userAgent.setBrowserVersion(userAgentInfo != null ? userAgentInfo.getBrowserVersionInfo() : null);
+        userAgent.setDevice(userAgentInfo != null ? userAgentInfo.getDeviceType() : null);
+        userAgent.setBrowser(userAgentInfo != null ? userAgentInfo.getUaName() : null);
+        userAgent.setType(userAgentInfo != null ? userAgentInfo.getType() : null);
         return userAgent;
     }
 }

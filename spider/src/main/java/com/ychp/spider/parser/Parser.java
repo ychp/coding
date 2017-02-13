@@ -57,8 +57,7 @@ public abstract class Parser<T extends SpiderData> {
                 e.printStackTrace();
             }
         }
-        Rule rule = ParserUtils.getRule(ruleValues);
-        return rule;
+        return ParserUtils.getRule(ruleValues);
     }
 
     public List<Node> generateTag(String html, Rule rule){
@@ -84,7 +83,7 @@ public abstract class Parser<T extends SpiderData> {
     }
 
     protected void putAllTags(List<Node> allTags, Node node){
-        if(node.nodeName().indexOf("root") != -1){
+        if(node.nodeName().contains("root")){
             for(Node child : node.childNodes()){
                 putAllTags(allTags, child);
             }
@@ -167,7 +166,10 @@ public abstract class Parser<T extends SpiderData> {
                 if (node.hasAttr("href")) {
                     item.put("url", node.attr("href"));
                 }
-                result.add(item);
+                if(item.get("url").matches("((http|ftp|https)://)(([a-zA-Z0-9\\._-]+\\.[a-zA-Z]{2,6})|([0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}))(:[0-9]{1,4})*(/[a-zA-Z0-9\\&%_\\./-~-]*)?")
+                        || item.get("url").matches("(/[a-zA-Z0-9\\&%_\\./-~-]*)[?]{0,1}")) {
+                    result.add(item);
+                }
             }
         }
         return result;
@@ -194,6 +196,7 @@ public abstract class Parser<T extends SpiderData> {
             String textContent = node.outerHtml();
             if(containKeyWord(rule.getKeyWord(), textContent)) {
                 item.put("content", textContent);
+                item.put("url", node.attr("src"));
                 result.add(item);
             }
         }
@@ -205,7 +208,7 @@ public abstract class Parser<T extends SpiderData> {
         String tagName;
         tagName = node.nodeName().toLowerCase();
         for (String reg : regs){
-            if(tagName.matches(reg) || tagName.indexOf(reg) != -1){
+            if(tagName.matches(reg) || tagName.contains(reg)){
                 return true;
             }
         }
@@ -241,6 +244,7 @@ public abstract class Parser<T extends SpiderData> {
                 data.setType(ScanType.VIDEO.getValue());
                 data.setContent(item.get("content"));
                 data.setUrl(item.get("url"));
+                data.setSource(rule.getUrlRegx());
                 result.add(data);
             }
         }
@@ -257,6 +261,7 @@ public abstract class Parser<T extends SpiderData> {
                 data.setType(ScanType.IMAGE.getValue());
                 data.setContent(item.get("content"));
                 data.setUrl(item.get("url"));
+                data.setSource(rule.getUrlRegx());
                 result.add(data);
             }
         }
@@ -273,6 +278,7 @@ public abstract class Parser<T extends SpiderData> {
                 data.setType(ScanType.TEXT.getValue());
                 data.setContent(item.get("content"));
                 data.setUrl(item.get("url"));
+                data.setSource(rule.getUrlRegx());
                 result.add(data);
             }
         }
@@ -288,6 +294,8 @@ public abstract class Parser<T extends SpiderData> {
                 data.setKeyword(rule.getKeyWords());
                 data.setType(ScanType.TAG.getValue());
                 data.setContent(item.get("content"));
+                data.setUrl(item.get("url"));
+                data.setSource(rule.getUrlRegx());
                 result.add(data);
             }
         }
@@ -297,12 +305,14 @@ public abstract class Parser<T extends SpiderData> {
     public List<T> parseContext(Map<String, String> ruleValues){
         Rule rule = initRule(ruleValues);
         String url = rule.getUrlRegx();
+        String html = "";
         if(url.startsWith("https")){
-            url = "http" + url.substring(5);
+            html = HttpRequest.getBySSL(url, "");
+        }else {
+            html = HttpRequest.sendGet(url, "");
         }
-        String html = HttpRequest.sendGet(url, "");
         html = removeUselessContent(html);
-        System.out.println(html);
+//        System.out.println(html);
         List<Map<String, Object>> datas = getDatas(html, rule);
         return makeResult(datas, rule);
     }
@@ -313,17 +323,16 @@ public abstract class Parser<T extends SpiderData> {
 
     protected String removeUselessContent(String html){
         if(!html.startsWith("<html") || !html.startsWith("<HTML")){
-            if(html.indexOf("<html") != -1) {
+            if(html.contains("<html")) {
                 html = html.substring(html.indexOf("<html"));
             }
-            if(html.indexOf("<HTML") != -1) {
-                html = html.substring(html.indexOf("<html"));
+            if(html.contains("<HTML")) {
+                html = html.substring(html.indexOf("<HTML"));
             }
         }
         return html;
     }
 
-    public static void main(String[] args){
+    public abstract List<T>  spider(Map<String, String> ruleValues);
 
-    }
 }

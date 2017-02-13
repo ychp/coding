@@ -46,6 +46,4 @@ public class RedisConfiguration{
         return new JedisTemplate(pool, redisProperties.getDatabase());
     }
 
-
-
 }

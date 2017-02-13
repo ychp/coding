@@ -8,7 +8,6 @@ import com.ychp.coding.common.model.SinaIpAddress;
 import com.ychp.coding.common.model.TaobaoIpAddress;
 import com.ychp.log.model.UserAgent;
 import com.ychp.log.utils.UaUtil;
-import cz.mallat.uasparser.UserAgentInfo;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 
@@ -18,8 +17,6 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
-
-import static com.ychp.coding.common.enums.IPAPIType.BAIDU;
 
 /**
  * Desc:
@@ -55,9 +52,6 @@ public class RequestUtil {
 
     /**
      * 获取ip归属地
-     * @param ip
-     * @param type
-     * @return
      */
     public static IpAddress getIpAddress(String ip, Integer type, String apiKey){
         IpAddress result;
@@ -84,8 +78,6 @@ public class RequestUtil {
 
     /**
      * 获取ip归属地(百度)
-     * @param ip
-     * @return
      */
     private static IpAddress baiduIpAddress(String ip, String apiKey) {
         IpAddress result = new IpAddress();
@@ -108,8 +100,6 @@ public class RequestUtil {
 
     /**
      * 获取ip归属地(淘宝)
-     * @param ip
-     * @return
      */
     private static IpAddress taobaoIpAddress(String ip) {
         IpAddress result = new IpAddress();
@@ -131,8 +121,6 @@ public class RequestUtil {
 
     /**
      * 获取ip归属地(新浪)
-     * @param ip
-     * @return
      */
     private static IpAddress sinaIpAddress(String ip) {
         IpAddress result = new IpAddress();
@@ -149,9 +137,9 @@ public class RequestUtil {
     }
 
     private static String get(String requestUrl, Boolean isCheck, String apiKey){
-        BufferedReader reader = null;
+        BufferedReader reader;
         String str = null;
-        StringBuffer sbf = new StringBuffer();
+        StringBuilder sbf = new StringBuilder();
         try {
             URL url = new URL(requestUrl);
             HttpURLConnection connection = (HttpURLConnection) url
@@ -164,7 +152,7 @@ public class RequestUtil {
             connection.connect();
             InputStream is = connection.getInputStream();
             reader = new BufferedReader(new InputStreamReader(is, "UTF-8"));
-            String strRead = null;
+            String strRead;
             while ((strRead = reader.readLine()) != null) {
                 sbf.append(strRead);
                 sbf.append("\r\n");
@@ -185,8 +173,7 @@ public class RequestUtil {
     }
 
     public static String getUrl(HttpServletRequest request){
-        String url = request.getRequestURL().toString();
-        return  url;
+        return request.getRequestURL().toString();
     }
 
 }

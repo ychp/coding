@@ -1,3 +1,4 @@
+#!/usr/bin/env bash
 # !/bin/sh
 echo "跳转到源码目录"
 cd /home/admin/works/cms

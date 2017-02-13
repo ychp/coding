@@ -1,0 +1,18 @@
+package {{modelPackage}};
+
+import {{modelPackage}}.BaseModel;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+
+/**
+* Desc:
+* Author: <a href="ychp@terminus.io">应程鹏</a>
+* Date: {{formatDate timestamp}}
+*/
+@Data
+@EqualsAndHashCode(callSuper = true)
+public class {{modelName}} extends BaseModel {
+{{#each columns}}
+    private {{javaType}} {{javaColumn}};
+{{/each}}
+}

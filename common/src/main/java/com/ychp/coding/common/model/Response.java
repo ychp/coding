@@ -15,12 +15,12 @@ public class Response<T> implements Serializable{
 
     private Boolean success = false;
 
-    public static Response ok(Object result){
-        return new Response(result);
+    public static <T> Response<T> ok(T t){
+        return new Response<>(t);
     }
 
-    public static Response fail(String error){
-        return new Response(error);
+    public static <T> Response<T> fail(String error){
+        return new Response<>(error);
     }
 
     public Response(){}
