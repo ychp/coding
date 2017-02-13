@@ -13,7 +13,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static com.ychp.code.builder.utils.BuilderUtils.PARAM_SPLIT_REGEX;
 import static com.ychp.code.builder.utils.BuilderUtils.SPLIT_COM;
 
 /**
@@ -39,15 +38,12 @@ public class HiveSqlBuilder extends Builder {
 
     @Override
     protected Map<String, Object> getParams(BufferedReader bufferedReader) throws IOException {
-        Map<String,Object> paramMap = new HashMap<String, Object>();
+        Map<String,Object> paramMap = new HashMap<>();
         String line;
         Boolean isColumns = false;
-        String[] paramKV;
         String[] columnArr;
         List<HiveColumnDto> columns = Lists.newArrayList();
         HiveColumnDto hiveColumnDto;
-        String key;
-        String value;
         while ((line = bufferedReader.readLine()) != null){
             if(line.contains("columns start")) {
                 isColumns = true;
@@ -59,15 +55,7 @@ public class HiveSqlBuilder extends Builder {
             }
 
             if(!isColumns){
-                if(!StringUtils.isEmpty(line.trim()) && line.contains(PARAM_SPLIT_REGEX)){
-                    paramKV = line.split(PARAM_SPLIT_REGEX);
-                    key = paramKV[0];
-                    value = paramKV[1];
-                    paramMap.put(key, value);
-                    if(value.contains(SPLIT_COM)){
-                        paramMap.put(key + "s", value.split(SPLIT_COM));
-                    }
-                }
+                parseNormalParam(line, paramMap);
             } else {
                 if(StringUtils.isEmpty(line.trim()) || !line.contains(COLUMN_SPLIT)) {
                     continue;

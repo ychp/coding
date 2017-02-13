@@ -25,7 +25,6 @@ public abstract class Builder {
             String templatePath = paramMap.get(TEMPLATE_PATH_KEY) != null ? (String)paramMap.get(TEMPLATE_PATH_KEY) : null;
             String[] templates = getTemplatePath(templatePath);
             String[] fileSuff = getFileSuff(paramMap.get(FILE_SUFF_KEY));
-            String fileName = paramMap.get(FILE_NAME_KEY) != null ? (String)paramMap.get(FILE_NAME_KEY) : null;
             if(fileSuff.length > templates.length){
                 throw new RuntimeException("file suff cannot more than template");
             }
@@ -82,7 +81,7 @@ public abstract class Builder {
         }
     }
 
-    protected void writeToLocal(String outPath, String fileSuf, String content){
+    private void writeToLocal(String outPath, String fileSuf, String content){
         BufferedWriter bufferedWriter = null;
         try{
             String fileName = outPath + (StringUtils.isEmpty(fileSuf) ? "" : fileSuf);
@@ -164,22 +163,23 @@ public abstract class Builder {
     protected Map<String,Object> getParams(BufferedReader bufferedReader) throws IOException {
         Map<String,Object> paramMap = Maps.newHashMap();
         String line;
-        String[] paramKV;
-        String key;
-        String value;
         while ((line = bufferedReader.readLine()) != null){
-            if(!StringUtils.isEmpty(line.trim()) && line.contains(PARAM_SPLIT_REGEX)){
-                paramKV = line.split(PARAM_SPLIT_REGEX);
-                key = paramKV[0];
-                value = paramKV[1];
-                paramMap.put(key, value);
-                if(value.contains(SPLIT_COM)){
-                    paramMap.put(key + "s", value.split(SPLIT_COM));
-                }
-            }
+            parseNormalParam(line, paramMap);
         }
 
         return paramMap;
+    }
+
+    protected void parseNormalParam(String line, Map<String, Object> paramMap){
+        if(!StringUtils.isEmpty(line.trim()) && !line.trim().startsWith(NOTE_COM) && line.contains(PARAM_SPLIT_REGEX)){
+            String[] paramKV = line.split(PARAM_SPLIT_REGEX);
+            String key = paramKV[0];
+            String value = paramKV[1];
+            paramMap.put(key, value);
+            if(value.contains(SPLIT_COM)){
+                paramMap.put(key + "s", value.split(SPLIT_COM));
+            }
+        }
     }
 
     protected abstract String getDefaultTemplate();

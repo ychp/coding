@@ -23,4 +23,6 @@ public class BuilderUtils {
 
     public static final String PARAM_SPLIT_REGEX = ":";
 
+    public static final String NOTE_COM = "#";
+
 }

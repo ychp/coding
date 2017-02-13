@@ -14,7 +14,6 @@ import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 
 import java.io.BufferedReader;
-import java.io.File;
 import java.io.IOException;
 import java.sql.*;
 import java.util.Date;
