@@ -2,7 +2,6 @@ package com.ychp.rpc.consul.properties;
 
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Component;
 
 /**
@@ -21,5 +20,9 @@ public class ConsulProperties {
 
     private Integer port;
 
-    private Integer interval;
+    private String health = "http://127.0.0.1:9020";
+
+    private Integer interval = 5;
+
+    private String version;
 }

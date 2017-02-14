@@ -3,16 +3,15 @@ package com.ychp.rpc.consul.service;
 import com.orbitz.consul.AgentClient;
 import com.orbitz.consul.Consul;
 import com.orbitz.consul.HealthClient;
-import com.orbitz.consul.model.ConsulResponse;
+import com.orbitz.consul.model.agent.ImmutableRegCheck;
 import com.orbitz.consul.model.agent.ImmutableRegistration;
-import com.orbitz.consul.model.health.ServiceHealth;
 import com.ychp.rpc.annotation.RpcProvider;
 import com.ychp.rpc.service.RpcCenter;
+import com.ychp.rpc.utils.RpcUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -32,11 +31,20 @@ public class ConsulRpcCenter extends RpcCenter {
 
     private Integer port;
 
+    private String defaultVersion;
+
+    private String health;
+
+    private Integer interval;
+
     @Autowired
-    public ConsulRpcCenter(Consul consul, String host, Integer port){
+    public ConsulRpcCenter(Consul consul, String host, Integer port, String defaultVersion, String health, Integer interval){
         this.consul = consul;
         this.host = host;
         this.port = port;
+        this.defaultVersion = defaultVersion;
+        this.health = health;
+        this.interval = interval;
     }
 
     @Override
@@ -45,7 +53,7 @@ public class ConsulRpcCenter extends RpcCenter {
         AgentClient agent = consul.agentClient();
 
         //健康检测
-//        ImmutableRegCheck check = ImmutableRegCheck.builder().http("http://192.168.1.104:9020/health").interval("5s").build();
+        ImmutableRegCheck check = ImmutableRegCheck.builder().http(health).interval(interval + "s").build();
 
         Map<String,Object> serviceMap = applicationContext.getBeansWithAnnotation(RpcProvider.class);
 
@@ -59,7 +67,10 @@ public class ConsulRpcCenter extends RpcCenter {
             if(service.getClass().getInterfaces() != null && service.getClass().getInterfaces().length > 0){
                 className = service.getClass().getInterfaces()[0].getSimpleName();
             }
-            builder.id(className).name(className.substring(0, 1).toLowerCase() + className.substring(1)).addTags(service.getClass().getAnnotation(RpcProvider.class).version()).address(host).port(port);
+            builder.id(className)
+                    .name(className.substring(0, 1).toLowerCase() + className.substring(1))
+                    .addTags(RpcUtils.firstNonNull(service.getClass().getAnnotation(RpcProvider.class).version(), defaultVersion))
+                    .address(host).port(port).addChecks(check);
             agent.register(builder.build());
             log.info("===> register service {}", className);
         }
@@ -72,17 +83,12 @@ public class ConsulRpcCenter extends RpcCenter {
         log.info("============> service consumer");
 
         HealthClient client = consul.healthClient();
-//        String name = "tomcat";
-        //获取所有服务
-        List<ServiceHealth> services = client.getAllServiceInstances("authorityManager").getResponse();
+        String name = "authorityManager";
 
-        for(ServiceHealth serviceHealth : services){
-            log.info("===> consumer service {}", serviceHealth.getService());
-        }
-
-        System.out.println(services.size());
         //获取所有正常的服务（健康检测通过的）
-//        client.getHealthyServiceInstances(name).getResponse().forEach(System.out::println);
+        client.getHealthyServiceInstances(name).getResponse().forEach((resp) -> {
+            log.info("===> consumer service {}", resp.getService());
+        });
         log.info("============> service consumer end");
 
     }

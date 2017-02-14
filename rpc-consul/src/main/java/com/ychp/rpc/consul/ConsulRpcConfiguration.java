@@ -28,6 +28,6 @@ public class ConsulRpcConfiguration {
     }
     @Bean
     public RpcCenter rpcCenter(Consul consul){
-        return new ConsulRpcCenter(consul, properties.getHost(), properties.getPort());
+        return new ConsulRpcCenter(consul, properties.getHost(), properties.getPort(), properties.getVersion(), properties.getHealth(), properties.getInterval());
     }
 }
