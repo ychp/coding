@@ -18,6 +18,8 @@
         <module>spider</module>
         <module>image</module>
         <module>code-builder</module>
+        <module>rpc-consul</module>
+        <module>rpc</module>
     </modules>
 
     <properties>
@@ -39,6 +41,7 @@
         <handlebars.version>1.2.1</handlebars.version>
         <mysql-connector.version>5.1.38</mysql-connector.version>
         <joda-time.version>2.3</joda-time.version>
+        <consul.version>0.12.3</consul.version>
     </properties>
 
     <dependencies>
@@ -66,6 +69,18 @@
 
     <dependencyManagement>
         <dependencies>
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot</artifactId>
+                <version>${spring-boot.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-starter-freemarker</artifactId>
+                <version>${spring-boot.version}</version>
+            </dependency>
+
             <dependency>
                 <groupId>com.github.jknack</groupId>
                 <artifactId>handlebars</artifactId>
@@ -105,6 +120,12 @@
                 <groupId>joda-time</groupId>
                 <artifactId>joda-time</artifactId>
                 <version>${joda-time.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.orbitz.consul</groupId>
+                <artifactId>consul-client</artifactId>
+                <version>${consul.version}</version>
             </dependency>
 
         </dependencies>
