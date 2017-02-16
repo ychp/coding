@@ -21,4 +21,6 @@ public class MybatisColumnDto implements Serializable {
     private String javaColumn;
 
     private String javaType;
+
+    private Boolean modelColumn = true;
 }

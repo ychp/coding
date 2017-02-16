@@ -1,20 +1,32 @@
 # 数据库类型，目前只支持mysql
 databaseType:mysql
+
 # 数据库连接host
 host:localhost
+
 # 数据库端口
 port:3306
+
 # 数据库名称
 database:club
+
 # 数据库用户名
 username:root
+
 # 数据库密码
 password:anywhere
+
 # 需要生成的表的表明
-tableName:auth_roles
+tableName:auth_users
+
 # java实体类名
-modelName:Role
+modelName:User
+
 # java实体类所在包路径
 modelPackage:com.ychp.model
+
 # java实体类dao文件所在包路径
 package:com.ychp.model.mysql
+
+# java实体类过滤字段
+modelFilterColumn:createdAt,updatedAt

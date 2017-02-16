@@ -2,7 +2,9 @@ package com.ychp.code.builder.impl;
 
 import com.github.jknack.handlebars.Handlebars;
 import com.github.jknack.handlebars.Helper;
+import com.github.jknack.handlebars.Options;
 import com.github.jknack.handlebars.Template;
+import com.github.jknack.handlebars.helper.UnlessHelper;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.ychp.code.builder.Builder;
@@ -37,6 +39,7 @@ public class MybatisBuilder extends Builder {
     private static final String DATABASE_KEY = "database";
     private static final String DATABASE_USERNAME_KEY = "username";
     private static final String DATABASE_PASSWORD_KEY = "password";
+    private static final String MODEL_FILTER_COLUMN_KEY = "modelFilterColumn";
     private static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormat.forPattern("yyyy/MM/dd");
 
     protected String buildFile(String templatePath, Map<String, Object> paramMap) throws IOException {
@@ -70,6 +73,11 @@ public class MybatisBuilder extends Builder {
         String database = (String) paramMap.get(DATABASE_KEY);
         String username = (String) paramMap.get(DATABASE_USERNAME_KEY);
         String password = (String) paramMap.get(DATABASE_PASSWORD_KEY);
+        String modelFilterColumn = (String) paramMap.get(MODEL_FILTER_COLUMN_KEY );
+        List<String> modelFilterColumns = null;
+        if(!StringUtils.isEmpty(modelFilterColumn)){
+            modelFilterColumns = Lists.newArrayList(modelFilterColumn.split(","));
+        }
 
         String url="jdbc:mysql://" + host + ":" + port + "/" + database + "?user=" + username + "&password=" + password;
         Connection connection = null;
@@ -104,14 +112,22 @@ public class MybatisBuilder extends Builder {
                 datasize = colRet.getInt("COLUMN_SIZE");
                 if(primaryColumnDto != null && primaryColumnDto.getSqlColumn().equals(columnName)){
                     primaryColumnDto.setJavaType(MybatisUtils.getJavaTypeByDBType(columnType, datasize));
+                    primaryColumnDto.setModelColumn(false);
                     templateParamMap.put("primaryColumn", primaryColumnDto);
                     continue;
                 }
+
                 columnDto = new MybatisColumnDto();
                 columnDto.setSqlColumn(columnName);
                 columnDto.setJavaColumn(MybatisUtils.camelName(columnName));
                 columnDto.setJavaXmlColumn("{" + MybatisUtils.camelName(columnName) + "}");
                 columnDto.setJavaType(MybatisUtils.getJavaTypeByDBType(columnType, datasize));
+
+                if(modelFilterColumns != null
+                        && (modelFilterColumns.contains(columnDto.getJavaColumn())
+                        || modelFilterColumns.contains(columnDto.getJavaXmlColumn()))){
+                    columnDto.setModelColumn(false);
+                }
                 columns.add(columnDto);
             }
 
