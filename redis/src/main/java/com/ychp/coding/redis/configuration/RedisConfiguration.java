@@ -4,6 +4,7 @@ import com.ychp.coding.redis.dao.JedisTemplate;
 import com.ychp.coding.redis.properties.RedisProperties;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
@@ -21,6 +22,7 @@ import redis.clients.util.Pool;
 @Primary
 @Configuration
 @EnableAutoConfiguration
+@EnableConfigurationProperties({RedisProperties.class})
 public class RedisConfiguration {
 
     @Autowired
