@@ -10,9 +10,9 @@ import org.springframework.stereotype.Component;
  * Author: <a href="ychp@terminus.io">应程鹏</a>
  * Date: 16/7/25
  */
+@Data
 @Component
 @ConfigurationProperties(prefix = "spring.redis")
-@Data
 public class RedisProperties {
 
     private String host;
@@ -27,12 +27,13 @@ public class RedisProperties {
     @Value("${spring.redis.pool.max-idle}")
     private String maxIdle;
 
+    @Value("${spring.redis.pool.min-idle}")
+    private String minIdle;
+
     @Value("${spring.redis.pool.max-wait}")
     private String maxWait;
 
     private String database;
 
-
     private String timeout;
-
 }
