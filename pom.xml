@@ -42,6 +42,7 @@
         <mysql-connector.version>5.1.38</mysql-connector.version>
         <joda-time.version>2.3</joda-time.version>
         <consul.version>0.12.3</consul.version>
+        <rapid-framework.version>4.0.5</rapid-framework.version>
     </properties>
 
     <dependencies>
@@ -126,6 +127,12 @@
                 <groupId>com.orbitz.consul</groupId>
                 <artifactId>consul-client</artifactId>
                 <version>${consul.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.googlecode.rapid-framework</groupId>
+                <artifactId>rapid-core</artifactId>
+                <version>${rapid-framework.version}</version>
             </dependency>
 
         </dependencies>
