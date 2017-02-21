@@ -10,7 +10,6 @@ import org.springframework.stereotype.Component;
  * Date: 17/2/13
  */
 @Data
-@Component
 @ConfigurationProperties(prefix = "rpc.consul")
 public class ConsulProperties {
 
@@ -19,8 +18,6 @@ public class ConsulProperties {
     private String host;
 
     private Integer port;
-
-    private String health = "http://127.0.0.1:9020";
 
     private Integer interval = 5;
 

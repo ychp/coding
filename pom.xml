@@ -20,6 +20,7 @@
         <module>code-builder</module>
         <module>rpc-consul</module>
         <module>rpc</module>
+        <module>rpc-dubbo</module>
     </modules>
 
     <properties>
@@ -41,6 +42,7 @@
         <handlebars.version>1.2.1</handlebars.version>
         <mysql-connector.version>5.1.38</mysql-connector.version>
         <joda-time.version>2.3</joda-time.version>
+        <dubbo.version>2.5.3</dubbo.version>
         <consul.version>0.12.3</consul.version>
         <rapid-framework.version>4.0.5</rapid-framework.version>
     </properties>
@@ -139,6 +141,12 @@
                 <groupId>com.googlecode.rapid-framework</groupId>
                 <artifactId>rapid-core</artifactId>
                 <version>${rapid-framework.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.alibaba</groupId>
+                <artifactId>dubbo</artifactId>
+                <version>${dubbo.version}</version>
             </dependency>
 
         </dependencies>

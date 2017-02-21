@@ -3,8 +3,9 @@ package com.ychp.rpc.consul;
 import com.google.common.net.HostAndPort;
 import com.orbitz.consul.Consul;
 import com.ychp.rpc.consul.properties.ConsulProperties;
-import com.ychp.rpc.consul.service.ConsulRpcCenter;
-import com.ychp.rpc.service.RpcCenter;
+import com.ychp.rpc.consul.provider.ConsulRpcRegistry;
+import com.ychp.rpc.dubbo.properties.DubboProperties;
+import com.ychp.rpc.provider.RpcRegistry;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
@@ -16,7 +17,7 @@ import org.springframework.context.annotation.Configuration;
  * Date: 17/2/13
  */
 @Configuration
-@EnableConfigurationProperties({ConsulProperties.class})
+@EnableConfigurationProperties({ConsulProperties.class, DubboProperties.class})
 public class ConsulRpcConfiguration {
 
     @Autowired
@@ -27,7 +28,7 @@ public class ConsulRpcConfiguration {
         return Consul.builder().withHostAndPort(HostAndPort.fromString(properties.getAddress())).build();
     }
     @Bean
-    public RpcCenter rpcCenter(Consul consul){
-        return new ConsulRpcCenter(consul, properties.getHost(), properties.getPort(), properties.getVersion(), properties.getHealth(), properties.getInterval());
+    public RpcRegistry rpcCenter(Consul consul){
+        return new ConsulRpcRegistry(consul, properties.getHost(), properties.getPort(), properties.getVersion(), properties.getHealth(), properties.getInterval());
     }
 }
