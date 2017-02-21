@@ -18,7 +18,6 @@
         <module>spider</module>
         <module>image</module>
         <module>code-builder</module>
-        <module>rpc-consul</module>
         <module>rpc</module>
         <module>rpc-dubbo</module>
     </modules>
