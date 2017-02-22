@@ -44,6 +44,7 @@
         <dubbo.version>2.5.3</dubbo.version>
         <consul.version>0.12.3</consul.version>
         <rapid-framework.version>4.0.5</rapid-framework.version>
+        <javassist.version>3.18.1-GA</javassist.version>
     </properties>
 
     <dependencies>
@@ -146,6 +147,30 @@
                 <groupId>com.alibaba</groupId>
                 <artifactId>dubbo</artifactId>
                 <version>${dubbo.version}</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>org.springframework</groupId>
+                        <artifactId>spring</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>org.javassist</groupId>
+                        <artifactId>javassist</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>org.apache.zookeeper</groupId>
+                        <artifactId>zookeeper</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>com.github.sgroschupf</groupId>
+                        <artifactId>zkclient</artifactId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
+
+            <dependency>
+                <groupId>org.javassist</groupId>
+                <artifactId>javassist</artifactId>
+                <version>${javassist.version}</version>
             </dependency>
 
         </dependencies>

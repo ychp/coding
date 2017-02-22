@@ -64,7 +64,7 @@ public class ConsulRpcRegistry extends DubboRpcRegistry {
             providerBean = publishRpcService(name, service);
             builder = ImmutableRegistration.builder();
             className = providerBean.getPath();
-            String health = "";
+            String health = providerBean.getProtocol().getNetworker();
             check = ImmutableRegCheck.builder().http(health).interval(interval + "s").build();
             builder.id(className)
                     .name(className.substring(0, 1).toLowerCase() + className.substring(1))
