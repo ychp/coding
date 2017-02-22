@@ -25,7 +25,7 @@ import org.springframework.context.annotation.Import;
  * Date: 17/2/13
  */
 @Configuration
-//@ConditionalOnProperty(value = {"rpc.mode"}, havingValue = "true")
+@ConditionalOnProperty(value = {"rpc.mode"}, havingValue = "true")
 @Import(DubboBaseAutoConfiguration.class)
 @EnableConfigurationProperties({ConsulProperties.class})
 public class ConsulRpcConfiguration {
