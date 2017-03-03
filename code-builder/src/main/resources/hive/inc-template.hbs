@@ -15,39 +15,36 @@ Insert overwrite table {{database}}.dwd_{{table_name}} partition(pt='${PT_DATE}'
 select
     om.horus_id,
     {{#each columns}}om.{{name}}{{#unless @last}},{{/unless}}
-    {{/each}}from (
-	SELECT
+    {{/each}}
+from (select
         pm.horus_id,
         {{#each columns}}pm.{{name}},
         {{/each}}row_number() over (partition by pm.horus_id order by pm.{{inc_column}} desc) num
-	FROM (
-		select
-		    case when b.horus_id is null then reflect("java.util.UUID", "randomUUID") else b.horus_id end as horus_id,
+    from (select
+            case when b.horus_id is null then uuid() else b.horus_id end as horus_id,
             {{#each columns}}am.{{name}}{{#unless @last}},{{/unless}}
-            {{/each}}from (
-				select
-                    {{#each columns}}t.{{name}}{{#unless @last}},{{/unless}}
-                    {{/each}}from (
-					select
-                        {{#each columns}}om.{{name}},
-                        {{/each}}row_number() over (partition by {{partition_column}} order by {{inc_column}} desc) num
-					from {{database}}.s_{{table_name}} where pt='${PT_DATE}'
-				) t
-				where t.num=1
-			) am  left join
-			( select
-			  horus_id,
+            {{/each}}
+        from (select
+                {{#each columns}}t.{{name}}{{#unless @last}},{{/unless}}
+                {{/each}}
+            from (select
+                    {{#each columns}}om.{{name}},
+                    {{/each}}row_number() over (partition by {{partition_column}} order by {{inc_column}} desc) num
+                from {{database}}.s_{{table_name}} where pt='${PT_DATE}') t
+            where t.num=1) am
+        left join (select
+              horus_id,
               {{#each partition_columns}}{{this}},
               {{/each}}{{inc_column}}
-			from {{database}}.dwd_{{table_name}} where pt='${YPT_DATE}' ) b
-			on
-			(
-            {{#if partition_columns}}{{#each partition_columns}}am.{{this}} = b.{{this}}{{#unless @last}}and{{/unless}}
-            {{/each}}{{else}}{{partition_column}}{{/if}})
+            from {{database}}.dwd_{{table_name}} where pt='${YPT_DATE}' ) b
+        on
+        (
+        {{#if partition_columns}}{{#each partition_columns}}am.{{this}} = b.{{this}}{{#unless @last}}and{{/unless}}
+        {{/each}}{{else}}am.{{partition_column}} = b.{{partition_column}}{{/if}})
 		union all
 		select
-			horus_id,
-            {{#each columns}}t.{{name}}{{#unless @last}},{{/unless}}
-            {{/each}}from {{database}}.dwd_{{table_name}} where pt = '${YPT_DATE}'
-	)  pm
+        t.horus_id,
+        {{#each columns}}t.{{name}}{{#unless @last}},{{/unless}}
+        {{/each}}
+    from {{database}}.dwd_{{table_name}} where pt = '${YPT_DATE}')  pm
 ) om where om.num=1;

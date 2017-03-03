@@ -1,0 +1,20 @@
+-- partition id {{partitionId}}
+insert into table {{database}}.dwd_tmp_address_similarity_partition
+select
+    base_info.group_id,
+    base_info.sub_group_id,
+    cast(s.similarity as int) as similarity
+from (select
+        master.group_id as group_id,
+        concat(master.pre_address, '|', master.address_str) as master_address,
+        slave.group_id as sub_group_id,
+        concat(slave.pre_address, '|', slave.address_str) as slave_address
+    from (select
+            horus_id,
+            family_id
+        from {{database}}.dwd_tmp_address_relation_by_partition as rp
+        where rp.pt in (select pt_value from {{database}}.dwd_tmp_address_partition where id = {{partitionId}})) as relation
+        left join {{database}}.dwd_tmp_address_by_geo as master on relation.horus_id = master.horus_id
+        left join {{database}}.dwd_tmp_address_by_geo as slave on relation.family_id = slave.horus_id) as base_info
+    lateral view similarity(master_address, slave_address) s as similarity;
+

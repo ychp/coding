@@ -1,0 +1,6 @@
+database:terminus
+file_name:计算地址相似度-分区
+base_index:1482
+interval:1
+end_index:1
+

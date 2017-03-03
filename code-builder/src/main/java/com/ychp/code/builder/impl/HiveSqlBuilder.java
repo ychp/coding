@@ -77,7 +77,7 @@ public class HiveSqlBuilder extends Builder {
     @Override
     protected String[] getFileSuff(Object fileSuffStr){
         if(fileSuffStr == null || StringUtils.isEmpty((String)fileSuffStr)){
-            return new String[]{"全量.q", "增量.q"};
+            return new String[]{"_full.q", "_inc.q"};
         } else {
             return ((String) fileSuffStr).split(SPLIT_COM);
         }

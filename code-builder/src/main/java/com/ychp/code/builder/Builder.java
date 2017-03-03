@@ -29,7 +29,8 @@ public abstract class Builder {
                 throw new RuntimeException("file suff cannot more than template");
             }
             String content;
-            String outPath = paramMap.get(OUT_PATH_KEY) != null ? (String) paramMap.get(OUT_PATH_KEY) : getDefaultOutPath(paramMap);
+            String outPath = paramMap.get(OUT_PATH_KEY) != null ? (String)paramMap.get(OUT_PATH_KEY) : getDefaultOutPath(paramMap);
+            String fullOutPath = outPath.endsWith("/") ? outPath + (StringUtils.isEmpty((String)paramMap.get(FILE_NAME_KEY)) ? DEFAULT_OUT_FILE_NAME : (String)paramMap.get(FILE_NAME_KEY)) : outPath + "/" + (StringUtils.isEmpty((String)paramMap.get(FILE_NAME_KEY)) ? DEFAULT_OUT_FILE_NAME : (String)paramMap.get(FILE_NAME_KEY));
             Map<String, Object> templateParamMap = generalTemplateParamMap(paramMap);
             for(int i = 0; i < templates.length; i++){
                 if(StringUtils.isEmpty(templates[i])){
@@ -37,11 +38,11 @@ public abstract class Builder {
                 }
                 content = buildFile(templates[i], templateParamMap);
                 if (fileSuff.length == templates.length){
-                    writeToLocal(outPath, fileSuff[i], content);
+                    writeToLocal(fullOutPath, fileSuff[i], content);
                 } else  if (fileSuff.length == 1){
-                    writeToLocal(outPath, fileSuff[1], content);
+                    writeToLocal(fullOutPath, fileSuff[1], content);
                 } else  if (fileSuff.length == 0){
-                    writeToLocal(outPath, null, content);
+                    writeToLocal(fullOutPath, null, content);
                 }
             }
 

@@ -1,14 +1,38 @@
-database:terminus
-file_name:d表scrm卡萨帝会员等级变化历史
-table_name:scrm_casarte_hcustomertype
-partition_column:hct_ctc_id,hct_ctt_id,hct_dt
-inc_column:hct_update_dt
+outPath:/Users/yingchengpeng/works/pigrest/db/hive/pig-doctor-import
+database:fdyehftqdp
+file_name:doctor_groups_import
+table_name:doctor_groups
+partition_column:org_id,farm_id,group_code
+inc_column:updated_at
 columns start
-| hct_ctc_id               | double                |                       |
-| hct_ctt_id               | double                |                       |
-| hct_dt                   | string                |                       |
-| hct_creation_dt          | string                |                       |
-| hct_update_dt            | string                |                       |
-| hct_creationuid          | string                |                       |
-| hct_updateuid            | string                |                       |
+| id                | bigint |         |
+| org_id            | bigint |         |
+| org_name          | string |         |
+| farm_id           | bigint |         |
+| farm_name         | string |         |
+| group_code        | string |         |
+| batch_no          | string |         |
+| open_at           | string |         |
+| close_at          | string |         |
+| status            | int    |         |
+| init_barn_id      | bigint |         |
+| init_barn_name    | string |         |
+| current_barn_id   | bigint |         |
+| current_barn_name | string |         |
+| pig_type          | int    |         |
+| breed_id          | bigint |         |
+| breed_name        | string |         |
+| genetic_id        | bigint |         |
+| genetic_name      | string |         |
+| staff_id          | bigint |         |
+| staff_name        | string |         |
+| remark            | string |         |
+| out_id            | string |         |
+| extra             | string |         |
+| creator_id        | bigint |         |
+| creator_name      | string |         |
+| updator_id        | bigint |         |
+| updator_name      | string |         |
+| created_at        | string |         |
+| updated_at        | string |         |
 columns end
