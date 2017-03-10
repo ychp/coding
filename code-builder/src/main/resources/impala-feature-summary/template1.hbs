@@ -1,0 +1,20 @@
+{{#each datas}}
+union all
+-- {{this.name}} {{this.id}}
+select
+    uuid() as id,
+    1 as model_id,
+    farm.farm_id as farm_id,
+    farm.dimension_id as dimension_id,
+    cast(farm.feature_value as string) as feature_value,
+    rule.score as feature_score,
+    '' as remark
+from (select
+        farm_id,
+        {{this.id}} as dimension_id,
+        sow_live_stock_count as feature_value
+    from fdyehftqdp.dwm_doctor_farm_model where pt='${PT_DATE}') as farm
+left join fdyehftqdp.s_pig_rest_xrnm_dimension_score_rules as rule on farm.dimension_id = rule.dimension_id
+where (rule.high_range is not null and farm.feature_value >= rule.low_range and farm.feature_value < rule.high_range)
+    or (rule.high_range is null and farm.feature_value >= rule.low_range)
+{{/each}}

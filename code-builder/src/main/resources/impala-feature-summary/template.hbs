@@ -1,0 +1,20 @@
+{{#each datas}}
+union all
+-- {{this.name}} {{this.id}}
+select
+    uuid() as id,
+    model_id as model_id,
+    farm_id as farm_id,
+    {{this.id}} as dimension_id,
+    cast(score as string) as feature_value,
+    score as feature_score,
+    '' as remark
+from (select
+        feature.model_id as model_id,
+        feature.farm_id as farm_id,
+        cast(sum(feature.feature_score * dimension.weight / 100) as int) as score
+    from (select model_id, farm_id, dimension_id, feature_score from fdyehftqdp.dwm_md_farm_feature where pt = '${PT_DATE}') as feature
+    left join fdyehftqdp.s_pig_rest_xrnm_dimension_weights as dimension on feature.dimension_id = dimension.id
+    where dimension.pid = {{this.id}}
+    group by feature.model_id,feature.farm_id) as feature
+{{/each}}
