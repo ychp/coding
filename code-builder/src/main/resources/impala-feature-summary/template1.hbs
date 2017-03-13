@@ -15,6 +15,6 @@ from (select
         sow_live_stock_count as feature_value
     from fdyehftqdp.dwm_doctor_farm_model where pt='${PT_DATE}') as farm
 left join fdyehftqdp.s_pig_rest_xrnm_dimension_score_rules as rule on farm.dimension_id = rule.dimension_id
-where (rule.high_range is not null and farm.feature_value >= rule.low_range and farm.feature_value < rule.high_range)
-    or (rule.high_range is null and farm.feature_value >= rule.low_range)
+where rule.dimension_id is not null and ((rule.high_range is not null and farm.feature_value >= rule.low_range and farm.feature_value < rule.high_range)
+    or (rule.high_range is null and farm.feature_value >= rule.low_range))
 {{/each}}

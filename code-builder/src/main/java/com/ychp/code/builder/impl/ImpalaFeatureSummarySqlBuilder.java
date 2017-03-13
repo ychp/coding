@@ -41,7 +41,7 @@ public class ImpalaFeatureSummarySqlBuilder extends Builder {
         Map<String,Object> paramMap = new HashMap<>();
         String line;
         String[] dataArr;
-        List<Map<String, String>> columns = Lists.newArrayList();
+        List<Map<String, String>> datas = Lists.newArrayList();
         Map<String, String> data;
         while ((line = bufferedReader.readLine()) != null){
             if(StringUtils.isEmpty(line.trim()) || !line.contains(COLUMN_SPLIT)) {
@@ -54,8 +54,9 @@ public class ImpalaFeatureSummarySqlBuilder extends Builder {
             data = Maps.newHashMap();
             data.put("name", dataArr[0]);
             data.put("id", dataArr[1]);
-            columns.add(data);
+            datas.add(data);
         }
+        paramMap.put("datas", datas);
 
         return paramMap;
     }
