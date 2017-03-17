@@ -8,7 +8,7 @@ host:localhost
 port:3306
 
 # 数据库名称
-database:club
+database:pig_rest
 
 # 数据库用户名
 username:root
@@ -17,16 +17,16 @@ username:root
 password:anywhere
 
 # 需要生成的表的表明
-tableName:auth_users
+tableName:pig_doctor_user_analyse
 
 # java实体类名
-modelName:User
+modelName:FarmDimension
 
 # java实体类所在包路径
-modelPackage:com.ychp.model
+modelPackage:io.terminus.pigrest.model.farm
 
 # java实体类dao文件所在包路径
-package:com.ychp.model.mysql
+package:io.terminus.pigrest.dao.farm
 
 # java实体类过滤字段
-modelFilterColumn:createdAt,updatedAt
+modelFilterColumn:s

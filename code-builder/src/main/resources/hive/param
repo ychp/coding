@@ -1,38 +1,47 @@
 outPath:/Users/yingchengpeng/works/pigrest/db/hive/pig-doctor-import
 database:fdyehftqdp
-file_name:doctor_groups_import
-table_name:doctor_groups
-partition_column:org_id,farm_id,group_code
+file_name:doctor_group_events_import
+table_name:doctor_group_events
+partition_column:id
 inc_column:updated_at
 columns start
-| id                | bigint |         |
-| org_id            | bigint |         |
-| org_name          | string |         |
-| farm_id           | bigint |         |
-| farm_name         | string |         |
-| group_code        | string |         |
-| batch_no          | string |         |
-| open_at           | string |         |
-| close_at          | string |         |
-| status            | int    |         |
-| init_barn_id      | bigint |         |
-| init_barn_name    | string |         |
-| current_barn_id   | bigint |         |
-| current_barn_name | string |         |
-| pig_type          | int    |         |
-| breed_id          | bigint |         |
-| breed_name        | string |         |
-| genetic_id        | bigint |         |
-| genetic_name      | string |         |
-| staff_id          | bigint |         |
-| staff_name        | string |         |
-| remark            | string |         |
-| out_id            | string |         |
-| extra             | string |         |
-| creator_id        | bigint |         |
-| creator_name      | string |         |
-| updator_id        | bigint |         |
-| updator_name      | string |         |
-| created_at        | string |         |
-| updated_at        | string |         |
+| id                 | bigint |         |
+| org_id             | bigint |         |
+| org_name           | string |         |
+| farm_id            | bigint |         |
+| farm_name          | string |         |
+| group_id           | bigint |         |
+| group_code         | string |         |
+| event_at           | string |         |
+| type               | int    |         |
+| name               | string |         |
+| desc               | string |         |
+| barn_id            | bigint |         |
+| barn_name          | string |         |
+| pig_type           | int    |         |
+| quantity           | int    |         |
+| weight             | double |         |
+| avg_weight         | double |         |
+| base_weight        | int    |         |
+| avg_day_age        | int    |         |
+| is_auto            | int    |         |
+| change_type_id     | bigint |         |
+| price              | bigint |         |
+| amount             | bigint |         |
+| over_price         | double |         |
+| trans_group_type   | int    |         |
+| in_type            | int    |         |
+| other_barn_id      | bigint |         |
+| other_barn_type    | string |         |
+| rel_group_event_id | bigint |         |
+| rel_pig_event_id   | bigint |         |
+| out_id             | string |         |
+| remark             | string |         |
+| extra              | string |         |
+| created_at         | string |         |
+| creator_id         | bigint |         |
+| creator_name       | string |         |
+| updated_at         | string |         |
+| updator_id         | bigint |         |
+| updator_name       | string |         |
 columns end

@@ -19,5 +19,5 @@ select
 from (select
         {{#each columns}}{{name}},
         {{/each}}row_number() over (partition by {{partition_column}} order by {{inc_column}} desc) num
-    from {{database}}.s_{{table_name}}) t
+    from {{database}}.s_{{table_name}} where pt='${PT_DATE}') t
 where t.num=1;

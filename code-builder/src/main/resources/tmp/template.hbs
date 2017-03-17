@@ -1,0 +1,7 @@
+    {{#each datas}}{{ename}}.feature_score as {{ename}}, -- {{name}}
+    {{/each}}
+
+
+
+{{#each datas}}left join (select farm_id, feature_score from fdyehftqdp.dwm_md_farm_feature where pt = '${PT_DATE}' and dimension_id = {{id}}) as {{ename}} on farm.farm_id = {{ename}}.farm_id
+{{/each}}

@@ -101,7 +101,8 @@ public class MybatisBuilder extends Builder {
                 primaryColumnDto = new MybatisColumnDto();
                 primaryColumnDto.setSqlColumn(columnName);
                 primaryColumnDto.setJavaColumn(MybatisUtils.camelName(columnName));
-                primaryColumnDto.setJavaXmlColumn("{" + MybatisUtils.camelName(columnName) + "}");
+//                primaryColumnDto.setJavaXmlColumn("{" + MybatisUtils.camelName(columnName) + "}");
+                primaryColumnDto.setJavaXmlColumn(MybatisUtils.camelName(columnName));
             }
 
             List<MybatisColumnDto> columns = Lists.newArrayList();
@@ -120,8 +121,10 @@ public class MybatisBuilder extends Builder {
                 columnDto = new MybatisColumnDto();
                 columnDto.setSqlColumn(columnName);
                 columnDto.setJavaColumn(MybatisUtils.camelName(columnName));
-                columnDto.setJavaXmlColumn("{" + MybatisUtils.camelName(columnName) + "}");
+//                columnDto.setJavaXmlColumn("{" + MybatisUtils.camelName(columnName) + "}");
+                columnDto.setJavaXmlColumn(MybatisUtils.camelName(columnName));
                 columnDto.setJavaType(MybatisUtils.getJavaTypeByDBType(columnType, datasize));
+                columnDto.setComment(colRet.getString("REMARKS"));
 
                 if(modelFilterColumns != null
                         && (modelFilterColumns.contains(columnDto.getJavaColumn())
@@ -177,7 +180,7 @@ public class MybatisBuilder extends Builder {
 
     @Override
     protected String getDefaultOutPath(Map<String, Object> paramMap) {
-        paramMap.put(FILE_NAME_KEY, paramMap.get("modelName"));
+//        paramMap.put(FILE_NAME_KEY, paramMap.get("modelName"));
         return super.getDefaultOutPath(paramMap);
     }
 

@@ -19,10 +19,11 @@ public class MybatisUtils {
             // 将第一个字符处理成大写
             result.append(name.substring(0, 1).toLowerCase());
             // 循环处理其余字符
-            for (int i = 1; i < name.length(); i++) {
-                String s = name.substring(i, i + 1);
+            char[] cahrArr = name.toCharArray();
+            for (int i = 1; i < cahrArr.length; i++) {
+                String s = cahrArr[i] + "";
                 // 在大写字母前添加下划线
-                if (s.equals(s.toLowerCase()) && !Character.isDigit(s.charAt(0))) {
+                if (!s.equals(s.toLowerCase()) && s.equals(s.toUpperCase())) {
                     result.append("_");
                 }
                 // 其他字符直接转成大写
@@ -73,7 +74,7 @@ public class MybatisUtils {
 
         switch (dbType.toLowerCase()){
             case "int":
-                if(dataSize > 10){
+                if(dataSize >= 10){
                     javaType = "Long";
                 } else {
                     javaType = "Integer";

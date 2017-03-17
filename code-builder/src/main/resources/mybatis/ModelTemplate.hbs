@@ -1,17 +1,13 @@
-package {{modelPackage}};
+package io.terminus.pigrest.model.farm
 
-import {{modelPackage}}.BaseModel;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
+import java.util.*
 
 /**
 * Desc:
 * Author: <a href="ychp@terminus.io">应程鹏</a>
-* Date: {{formatDate timestamp}}
+* Date: 17/3/15
 */
-@Data
-@EqualsAndHashCode(callSuper = true)
-public class {{modelName}} extends BaseModel {
+data class {{modelName}} (
 {{#each columns}}
-    {{#if modelColumn}}private {{javaType}} {{javaColumn}};{{/if}}{{/each}}
-}
+    {{#if modelColumn}}var {{javaColumn}}:{{javaType}}? = null{{#unless @last}},{{/unless}}{{/if}} //{{comment}}{{/each}}
+)
