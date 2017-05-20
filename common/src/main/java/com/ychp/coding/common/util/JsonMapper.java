@@ -2,71 +2,118 @@ package com.ychp.coding.common.util;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.JavaType;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.*;
+import com.fasterxml.jackson.databind.util.JSONPObject;
 import com.fasterxml.jackson.datatype.guava.GuavaModule;
-import org.apache.commons.lang3.StringUtils;
+import com.google.common.base.Strings;
+import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
+import java.text.DateFormat;
 
 /**
  * Desc:
  * Author: <a href="ychp@terminus.io">应程鹏</a>
  * Date: 16/7/23
  */
+@Slf4j
 public class JsonMapper {
-
-    public static JsonMapper JSON_NON_DEFAULT_MAPPER;
-
+    public static final JsonMapper JSON_NON_EMPTY_MAPPER;
+    public static final JsonMapper JSON_NON_DEFAULT_MAPPER;
     private ObjectMapper mapper = new ObjectMapper();
 
-    static {
-        JSON_NON_DEFAULT_MAPPER = new JsonMapper(JsonInclude.Include.NON_DEFAULT);
-    }
-
-    public JsonMapper(JsonInclude.Include include){
+    private JsonMapper(JsonInclude.Include include) {
         this.mapper.setSerializationInclusion(include);
         this.mapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
         this.mapper.registerModule(new GuavaModule());
     }
 
-    public <T> T fromJson(String json, Class<T> type){
-        if(StringUtils.isEmpty(json)){
-            return null;
-        }
-        try {
-            return this.mapper.readValue(json, type);
-        } catch (IOException e) {
-            e.printStackTrace();
-            return null;
-        }
+    public static JsonMapper nonEmptyMapper() {
+        return JSON_NON_EMPTY_MAPPER;
     }
 
-    public <T> T fromJson(String json,JavaType javaType) {
-        if(StringUtils.isEmpty(json)){
-            return null;
-        }
-        try {
-            return this.mapper.readValue(json, javaType);
-        } catch (IOException e) {
-            e.printStackTrace();
-            return null;
-        }
+    public static JsonMapper nonDefaultMapper() {
+        return JSON_NON_DEFAULT_MAPPER;
     }
 
-    public String toJson(Object object) throws JsonProcessingException {
+    public String toJson(Object object) {
         try {
             return this.mapper.writeValueAsString(object);
-        } catch (IOException e) {
-            e.printStackTrace();
+        } catch (IOException var3) {
+            log.warn("write to json string error:" + object, var3);
             return null;
         }
+    }
+
+    public <T> T fromJson(String jsonString, Class<T> clazz) {
+        if(Strings.isNullOrEmpty(jsonString)) {
+            return null;
+        } else {
+            try {
+                return this.mapper.readValue(jsonString, clazz);
+            } catch (IOException var4) {
+                log.warn("parse json string error:" + jsonString, var4);
+                return null;
+            }
+        }
+    }
+
+    public <T> T fromJson(String jsonString, JavaType javaType) {
+        if(Strings.isNullOrEmpty(jsonString)) {
+            return null;
+        } else {
+            try {
+                return this.mapper.readValue(jsonString, javaType);
+            } catch (Exception var4) {
+                log.warn("parse json string error:" + jsonString, var4);
+                return null;
+            }
+        }
+    }
+
+    public JsonNode treeFromJson(String jsonString) throws IOException {
+        return this.mapper.readTree(jsonString);
+    }
+
+    public <T> T treeToValue(JsonNode node, Class<T> clazz) throws JsonProcessingException {
+        return this.mapper.treeToValue(node, clazz);
     }
 
     public JavaType createCollectionType(Class<?> collectionClass, Class... elementClasses) {
         return this.mapper.getTypeFactory().constructParametricType(collectionClass, elementClasses);
     }
 
+    public <T> T update(String jsonString, T object) {
+        try {
+            return this.mapper.readerForUpdating(object).readValue(jsonString);
+        } catch (JsonProcessingException var4) {
+            log.warn("update json string:" + jsonString + " to object:" + object + " error.", var4);
+        } catch (IOException var5) {
+            log.warn("update json string:" + jsonString + " to object:" + object + " error.", var5);
+        }
 
+        return null;
+    }
+
+    public String toJsonP(String functionName, Object object) {
+        return this.toJson(new JSONPObject(functionName, object));
+    }
+
+    public void enableEnumUseToString() {
+        this.mapper.enable(SerializationFeature.WRITE_ENUMS_USING_TO_STRING);
+        this.mapper.enable(DeserializationFeature.READ_ENUMS_USING_TO_STRING);
+    }
+
+    public void setDateFormat(DateFormat format) {
+        this.mapper.setDateFormat(format);
+    }
+
+    public ObjectMapper getMapper() {
+        return this.mapper;
+    }
+
+    static {
+        JSON_NON_EMPTY_MAPPER = new JsonMapper(JsonInclude.Include.NON_EMPTY);
+        JSON_NON_DEFAULT_MAPPER = new JsonMapper(JsonInclude.Include.NON_DEFAULT);
+    }
 }
