@@ -17,7 +17,7 @@ username:root
 password:anywhere
 
 # 需要生成的表的表明
-tableName:pig_doctor_user_analyse
+tableName:pig_doctor_farm_feature_detail
 
 # java实体类名
 modelName:FarmDimension

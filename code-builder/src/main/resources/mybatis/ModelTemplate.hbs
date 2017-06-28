@@ -9,5 +9,5 @@ import java.util.*
 */
 data class {{modelName}} (
 {{#each columns}}
-    {{#if modelColumn}}var {{javaColumn}}:{{javaType}}? = null{{#unless @last}},{{/unless}}{{/if}} //{{comment}}{{/each}}
+{{#if modelColumn}}{{javaColumn}}{{/if}} //{{comment}}{{/each}}
 )

@@ -20,6 +20,7 @@
         <module>code-builder</module>
         <module>rpc</module>
         <module>rpc-dubbo</module>
+        <module>session</module>
     </modules>
 
     <properties>
