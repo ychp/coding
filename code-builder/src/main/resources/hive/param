@@ -1,34 +1,11 @@
 outPath:/Users/yingchengpeng/works/bi/db/hive_script/导入
-database:terminus
-file_name:parana退款单导入
-table_name:parana_refunds
+database:aaaa
+file_name:  aaaa
+table_name: aaaaa
 partition_column:id
 inc_column:updated_at
 columns start
 |id                |  	bigint   |  |
 |refund_type       |  	int   |  |
 |fee               |  	bigint   |  |
-|diff_fee          |  	int   |  |
-|shop_id           |  	bigint   |  |
-|shop_name         |  	string   |  |
-|buyer_id          |  	bigint   |  |
-|buyer_name        |  	string   |  |
-|out_id            |  	string   |  |
-|integral          |  	bigint   |  |
-|balance           |  	bigint   |  |
-|status            |  	bigint   |  |
-|refund_serial_no  |  	string   |  |
-|payment_id        |  	bigint   |  |
-|pay_serial_no     |  	string   |  |
-|refund_account_no |  	string   |  |
-|channel           |  	string   |  |
-|promotion_id      |  	bigint   |  |
-|buyer_note        |  	string   |  |
-|seller_note       |  	string   |  |
-|extra_json        |  	string   |  |
-|tags_json         |  	string   |  |
-|refund_at         |  	string   |  |
-|created_at        |  	string   |  |
-|updated_at        |  	string   |  |
-|trade_no          |  	string   |  |
 columns end

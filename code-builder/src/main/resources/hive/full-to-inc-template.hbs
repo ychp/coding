@@ -21,14 +21,3 @@ left join (
 ) t2
 on t1.horus_id = t2.horus_id
 where t2.{{partition_column}} is null or t1.{{partition_column}} != t2.{{partition_column}};
-
-
--- 全量变增量
-insert overwrite table {{database}}.dwd_{{table_name}} partition (pt = '${YPT_DATE}')
-select
-    horus_id,
-    {{#each columns}}{{name}}{{#unless @last}},{{/unless}}
-    {{/each}}
-from {{database}}.dwd_{{table_name}} where pt = 'INC_${YPT_DATE}';
-
-alter table {{database}}.dwd_{{table_name}} drop if exists partition (pt = 'INC_${YPT_DATE}');
