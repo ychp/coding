@@ -1,3 +1,4 @@
+invalidate metadata;
 -- 创建表
 create table if not exists {{database}}.dwd_{{table_name}} (
 horus_id				string,
@@ -11,40 +12,25 @@ TBLPROPERTIES (
 );
 
 -- 增量插入
-Insert overwrite table {{database}}.dwd_{{table_name}} partition(pt='${PT_DATE}')
-select
-    om.horus_id,
-    {{#each columns}}om.{{name}}{{#unless @last}},{{/unless}}
+insert overwrite table {{database}}.dwd_{{table_name}} partition(pt='${PT_DATE}')
+select 
+    horus_id,
+    {{#each columns}}{{name}}{{#unless @last}},{{/unless}}
     {{/each}}
 from (select
-        pm.horus_id,
-        {{#each columns}}pm.{{name}},
-        {{/each}}row_number() over (partition by pm.horus_id order by pm.{{inc_column}} desc) num
-    from (select
-            case when b.horus_id is null then uuid() else b.horus_id end as horus_id,
-            {{#each columns}}am.{{name}}{{#unless @last}},{{/unless}}
-            {{/each}}
-        from (select
-                {{#each columns}}t.{{name}}{{#unless @last}},{{/unless}}
-                {{/each}}
-            from (select
-                    {{#each columns}}om.{{name}},
-                    {{/each}}row_number() over (partition by {{partition_column}} order by {{inc_column}} desc) num
-                from {{database}}.s_{{table_name}} as om where pt='${PT_DATE}') t
-            where t.num=1) am
-        left join (select
-              horus_id,
-              {{#if partition_columns}}{{#each partition_columns}}{{this}},
-              {{/each}}{{inc_column}}{{else}}{{partition_column}}{{/if}}
-            from {{database}}.dwd_{{table_name}} where pt='${YPT_DATE}' ) b
-        on
-        (
-        {{#if partition_columns}}{{#each partition_columns}}am.{{this}} = b.{{this}}{{#unless @last}}and{{/unless}}
-        {{/each}}{{else}}am.{{partition_column}} = b.{{partition_column}}{{/if}})
-		union all
-		select
-        t.horus_id,
-        {{#each columns}}t.{{name}}{{#unless @last}},{{/unless}}
+        first_value(horus_id) over (partition by {{partition_column}} order by {{inc_column}} asc) as horus_id,
+        {{partition_column}},{{#each columns}}{{#unequals name partition_column}}first_value({{name}}) over (partition by {{partition_column}} order by {{inc_column}} desc) as {{name}}{{#unless @last}},{{/unless}}{{/unequals}}
         {{/each}}
-    from {{database}}.dwd_{{table_name}} as t where pt = '${YPT_DATE}')  pm
-) om where om.num=1;
+    from (select 
+            horus_id,
+            {{#each columns}}{{name}}{{#unless @last}},{{/unless}}
+            {{/each}}
+        from {{database}}.dwd_{{table_name}} where pt = '${YPT_DATE}'
+        union all
+        select 
+            uuid() as horus_id,
+            {{#each columns}}{{name}}{{#unless @last}},{{/unless}}
+            {{/each}}
+        from {{database}}.s_{{table_name}} where pt = '${PT_DATE}') as inner_tmp
+    ) as tmp
+    group by horus_id, {{#each columns}}{{name}}{{#unless @last}},{{/unless}}{{/each}};

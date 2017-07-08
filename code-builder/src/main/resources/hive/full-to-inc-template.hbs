@@ -1,0 +1,34 @@
+-- 筛选出来发生变化的数据
+insert overwrite table {{database}}.dwd_{{table_name}} partition (pt = 'INC_${PT_DATE}')
+select
+    t1.horus_id,
+    {{#each columns}}t1.{{name}}{{#unless @last}},{{/unless}}
+    {{/each}}
+from (
+    select
+        horus_id,
+        {{#each columns}}{{name}}{{#unless @last}},{{/unless}}
+        {{/each}}
+    from {{database}}.dwd_{{table_name}}
+    where pt = '${PT_DATE}'
+) t1
+left join (
+    select
+        horus_id,
+        {{partition_column}}
+    from {{database}}.dwd_{{table_name}}
+    where pt = '${YPT_DATE}'
+) t2
+on t1.horus_id = t2.horus_id
+where t2.{{partition_column}} is null or t1.{{partition_column}} != t2.{{partition_column}};
+
+
+-- 全量变增量
+insert overwrite table {{database}}.dwd_{{table_name}} partition (pt = '${YPT_DATE}')
+select
+    horus_id,
+    {{#each columns}}{{name}}{{#unless @last}},{{/unless}}
+    {{/each}}
+from {{database}}.dwd_{{table_name}} where pt = 'INC_${YPT_DATE}';
+
+alter table {{database}}.dwd_{{table_name}} drop if exists partition (pt = 'INC_${YPT_DATE}');

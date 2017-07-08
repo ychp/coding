@@ -1,3 +1,4 @@
+invalidate metadata;
 -- 创建表
 create table if not exists {{database}}.dwd_{{table_name}} (
 horus_id				string,
@@ -11,7 +12,7 @@ TBLPROPERTIES (
 );
 
 -- 全量插入
-Insert overwrite table {{database}}.dwd_{{table_name}} partition(pt='${PT_DATE}')
+Insert overwrite table {{database}}.dwd_{{table_name}} partition(pt='INC_${PT_DATE}')
 select
     uuid(),
     {{#each columns}}{{name}}{{#unless @last}},{{/unless}}
@@ -21,3 +22,10 @@ from (select
         {{/each}}row_number() over (partition by {{partition_column}} order by {{inc_column}} desc) num
     from {{database}}.s_{{table_name}} where pt='${PT_DATE}') t
 where t.num=1;
+
+Insert overwrite table {{database}}.dwd_{{table_name}} partition(pt='${PT_DATE}')
+select
+    horus_id,
+    {{#each columns}}{{name}}{{#unless @last}},{{/unless}}
+    {{/each}}
+from {{database}}.dwd_{{table_name}} where pt='INC_${PT_DATE}';

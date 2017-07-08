@@ -1,47 +1,34 @@
-outPath:/Users/yingchengpeng/works/pigrest/db/hive/pig-doctor-import
-database:fdyehftqdp
-file_name:doctor_group_events_import
-table_name:doctor_group_events
+outPath:/Users/yingchengpeng/works/bi/db/hive_script/导入
+database:terminus
+file_name:parana退款单导入
+table_name:parana_refunds
 partition_column:id
 inc_column:updated_at
 columns start
-| id                 | bigint |         |
-| org_id             | bigint |         |
-| org_name           | string |         |
-| farm_id            | bigint |         |
-| farm_name          | string |         |
-| group_id           | bigint |         |
-| group_code         | string |         |
-| event_at           | string |         |
-| type               | int    |         |
-| name               | string |         |
-| desc               | string |         |
-| barn_id            | bigint |         |
-| barn_name          | string |         |
-| pig_type           | int    |         |
-| quantity           | int    |         |
-| weight             | double |         |
-| avg_weight         | double |         |
-| base_weight        | int    |         |
-| avg_day_age        | int    |         |
-| is_auto            | int    |         |
-| change_type_id     | bigint |         |
-| price              | bigint |         |
-| amount             | bigint |         |
-| over_price         | double |         |
-| trans_group_type   | int    |         |
-| in_type            | int    |         |
-| other_barn_id      | bigint |         |
-| other_barn_type    | string |         |
-| rel_group_event_id | bigint |         |
-| rel_pig_event_id   | bigint |         |
-| out_id             | string |         |
-| remark             | string |         |
-| extra              | string |         |
-| created_at         | string |         |
-| creator_id         | bigint |         |
-| creator_name       | string |         |
-| updated_at         | string |         |
-| updator_id         | bigint |         |
-| updator_name       | string |         |
+|id                |  	bigint   |  |
+|refund_type       |  	int   |  |
+|fee               |  	bigint   |  |
+|diff_fee          |  	int   |  |
+|shop_id           |  	bigint   |  |
+|shop_name         |  	string   |  |
+|buyer_id          |  	bigint   |  |
+|buyer_name        |  	string   |  |
+|out_id            |  	string   |  |
+|integral          |  	bigint   |  |
+|balance           |  	bigint   |  |
+|status            |  	bigint   |  |
+|refund_serial_no  |  	string   |  |
+|payment_id        |  	bigint   |  |
+|pay_serial_no     |  	string   |  |
+|refund_account_no |  	string   |  |
+|channel           |  	string   |  |
+|promotion_id      |  	bigint   |  |
+|buyer_note        |  	string   |  |
+|seller_note       |  	string   |  |
+|extra_json        |  	string   |  |
+|tags_json         |  	string   |  |
+|refund_at         |  	string   |  |
+|created_at        |  	string   |  |
+|updated_at        |  	string   |  |
+|trade_no          |  	string   |  |
 columns end

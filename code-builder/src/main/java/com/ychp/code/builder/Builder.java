@@ -1,5 +1,6 @@
 package com.ychp.code.builder;
 
+import com.github.jknack.handlebars.Handlebars;
 import com.google.common.collect.Maps;
 import org.apache.commons.lang3.StringUtils;
 
@@ -103,6 +104,41 @@ public abstract class Builder {
     }
 
     protected abstract String buildFile(String templatePath, Map<String, Object> paramMap) throws IOException;
+
+    protected Handlebars getHandlebars(){
+        Handlebars handlebars = new Handlebars();
+        handlebars.registerHelper("equals", (context, options) -> {
+            CharSequence result;
+            String right = context.toString();
+            String left = options.param(0).toString();
+            if ((right != null) && (left != null)) {
+                if (right.equals(left)) {
+                    result = options.fn(context);
+                } else {
+                    result = options.inverse(context);
+                }
+                return result;
+            } else {
+                return null;
+            }
+        });
+        handlebars.registerHelper("unequals", (context, options) -> {
+            CharSequence result;
+            String right = context.toString();
+            String left = options.param(0).toString();
+            if ((right != null) && (left != null)) {
+                if (!right.equals(left)) {
+                    result = options.fn(context);
+                } else {
+                    result = options.inverse(context);
+                }
+                return result;
+            } else {
+                return null;
+            }
+        });
+        return handlebars;
+    }
 
     private String[] getTemplatePath(String templatePath) throws FileNotFoundException {
         if(templatePath == null){
