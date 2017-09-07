@@ -2,7 +2,7 @@ package com.ychp.session;
 
 import com.google.common.collect.Maps;
 import com.ychp.coding.common.util.JsonMapper;
-import com.ychp.coding.redis.dao.JedisTemplate;
+import com.ychp.redis.dao.JedisTemplate;
 import com.ychp.session.utils.SessionUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;

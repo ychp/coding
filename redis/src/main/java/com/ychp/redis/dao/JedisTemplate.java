@@ -1,4 +1,4 @@
-package com.ychp.coding.redis.dao;
+package com.ychp.redis.dao;
 
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.exceptions.JedisConnectionException;

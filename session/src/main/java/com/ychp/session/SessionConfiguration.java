@@ -1,12 +1,14 @@
 package com.ychp.session;
 
-import com.ychp.coding.redis.dao.JedisTemplate;
+import com.ychp.redis.configuration.RedisAutoConfiguration;
+import com.ychp.redis.dao.JedisTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Import;
 import org.springframework.util.StringUtils;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
@@ -18,6 +20,7 @@ import redis.clients.util.Pool;
  * Author: <a href="ychp@terminus.io">应程鹏</a>
  * Date: 2017/6/26
  */
+@Import(RedisAutoConfiguration.class)
 @Configuration
 @EnableAutoConfiguration
 @EnableConfigurationProperties(SessionProperties.class)
@@ -30,11 +33,11 @@ public class SessionConfiguration {
     @ConditionalOnMissingBean(JedisPoolConfig.class)
     public JedisPoolConfig getJedisPoolConfig(){
         JedisPoolConfig config = new JedisPoolConfig();
-        if(!StringUtils.isEmpty(sessionProperties.getMaxActive())) {
-            config.setMaxTotal(Integer.valueOf(sessionProperties.getMaxActive()));
+        if(!StringUtils.isEmpty(sessionProperties.getRedis().getPool().getMaxActive())) {
+            config.setMaxTotal(Integer.valueOf(sessionProperties.getRedis().getPool().getMaxActive()));
         }
-        if(!StringUtils.isEmpty(sessionProperties.getMaxIdle())) {
-            config.setMaxIdle(Integer.valueOf(sessionProperties.getMaxIdle()));
+        if(!StringUtils.isEmpty(sessionProperties.getRedis().getPool().getMaxIdle())) {
+            config.setMaxIdle(Integer.valueOf(sessionProperties.getRedis().getPool().getMaxIdle()));
         }
         if(!StringUtils.isEmpty(sessionProperties.getMinIdle())) {
             config.setMinIdle(Integer.valueOf(sessionProperties.getMaxIdle()));

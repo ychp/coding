@@ -1,7 +1,7 @@
-package com.ychp.coding.redis.configuration;
+package com.ychp.redis.configuration;
 
-import com.ychp.coding.redis.dao.JedisTemplate;
-import com.ychp.coding.redis.properties.RedisProperties;
+import com.ychp.redis.dao.JedisTemplate;
+import com.ychp.redis.properties.RedisProperties;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -23,7 +23,7 @@ import redis.clients.util.Pool;
 @Configuration
 @EnableAutoConfiguration
 @EnableConfigurationProperties({RedisProperties.class})
-public class RedisConfiguration {
+public class RedisAutoConfiguration {
 
     @Autowired
     private RedisProperties redisProperties;
@@ -31,26 +31,26 @@ public class RedisConfiguration {
     @Bean
     public JedisPoolConfig getJedisPoolConfig(){
         JedisPoolConfig config = new JedisPoolConfig();
-        if(!StringUtils.isEmpty(redisProperties.getMaxActive())) {
-            config.setMaxTotal(Integer.valueOf(redisProperties.getMaxActive()));
+        if(!StringUtils.isEmpty(redisProperties.getPool().getMaxActive())) {
+            config.setMaxTotal(redisProperties.getPool().getMaxActive());
         }
-        if(!StringUtils.isEmpty(redisProperties.getMaxIdle())) {
-            config.setMaxIdle(Integer.valueOf(redisProperties.getMaxIdle()));
+        if(!StringUtils.isEmpty(redisProperties.getPool().getMaxIdle())) {
+            config.setMaxIdle(redisProperties.getPool().getMaxIdle());
         }
-        if(!StringUtils.isEmpty(redisProperties.getMinIdle())) {
-            config.setMinIdle(Integer.valueOf(redisProperties.getMaxIdle()));
+        if(!StringUtils.isEmpty(redisProperties.getPool().getMinIdle())) {
+            config.setMinIdle(redisProperties.getPool().getMaxIdle());
         }
-        if(!StringUtils.isEmpty(redisProperties.getMaxWait())) {
-            config.setMaxWaitMillis(Integer.valueOf(redisProperties.getMaxWait()));
+        if(!StringUtils.isEmpty(redisProperties.getPool().getMaxWait())) {
+            config.setMaxWaitMillis(redisProperties.getPool().getMaxWait());
         }
         return config;
     }
 
     @Bean
     public JedisPool getJedisPool(JedisPoolConfig jedisPoolConfig){
-        Integer port = StringUtils.isEmpty(redisProperties.getPort()) ? 6379 : Integer.valueOf(redisProperties.getPort());
-        Integer timeOut = StringUtils.isEmpty(redisProperties.getTimeout()) ? 1000 : Integer.valueOf(redisProperties.getTimeout());
-        Integer database = StringUtils.isEmpty(redisProperties.getDatabase()) ? 0 : Integer.valueOf(redisProperties.getDatabase());
+        Integer port = StringUtils.isEmpty(redisProperties.getPort()) ? 6379 : redisProperties.getPort();
+        Integer timeOut = StringUtils.isEmpty(redisProperties.getTimeout()) ? 1000 : redisProperties.getTimeout();
+        Integer database = StringUtils.isEmpty(redisProperties.getDatabase()) ? 0 : redisProperties.getDatabase();
         return StringUtils.isEmpty(redisProperties.getPassword()) ?
                 new JedisPool(jedisPoolConfig, redisProperties.getHost(), port, timeOut, null, database) :
                 new JedisPool(jedisPoolConfig, redisProperties.getHost(), port, timeOut, redisProperties.getPassword(), database);
@@ -58,7 +58,7 @@ public class RedisConfiguration {
 
     @Bean
     public JedisTemplate getJedisTemplate(Pool<Jedis> jedisPool){
-        Integer database = StringUtils.isEmpty(redisProperties.getDatabase()) ? 0 : Integer.valueOf(redisProperties.getDatabase());
+        Integer database = StringUtils.isEmpty(redisProperties.getDatabase()) ? 0 : redisProperties.getDatabase();
         return new JedisTemplate(jedisPool, database);
     }
 
